@@ -1,0 +1,27 @@
+body {
+  background: black;
+}
+
+.title {
+  color: white;
+  text-align: center;
+}
+
+.image_title {
+  color: white;
+  text-align: left;
+}
+
+.images_container {
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+}
+
+.image_container {
+  margin-bottom: 10%;
+}
+
+.image {
+  width: 100%;
+}
