@@ -1,27 +1,24 @@
 body {
-  background: black;
+    background: black;
 }
 
 .title {
-  color: white;
-  text-align: center;
+    color: white;
+    text-align: center;
 }
 
 .image_title {
-  color: white;
-  text-align: left;
+    color: white;
+    text-align: left;
 }
 
 .images_container {
-  margin-left: auto;
-  margin-right: auto;
-  width: 80%;
-}
-
-.image_container {
-  margin-bottom: 10%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
 .image {
-  width: 100%;
+    width: 100%;
+    margin-bottom: 10%;
 }
