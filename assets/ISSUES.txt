@@ -1,0 +1,14 @@
+PROBLEMS
+
+QUESTIONS
+input.js
+// google chrome dev tools mobile view:
+// add console.log(e.type) to press
+// add console.log('release') to release
+// release is only called if touchend or touchcancel
+// I have never gotten touchcancel to fire
+// thus, I assume console.log('release') in release may be
+//      interpreted as console.log('touchend')
+// long press on cell calls only touchend
+// short press on cell calls touchend -> mousedown -> touchend
+// WHY?
