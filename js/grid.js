@@ -3,9 +3,9 @@ import { addWordFound, wordNotFound, isWord } from './wordsFound.js';
 import { addPoints } from './score.js';
 
 const gridElement = document.getElementById('grid');
-const yellow = 'rgb(200, 180, 0)';
-const green = 'rgb(0, 220, 0)';
-const blue = 'rgb(20, 0, 200)'
+const yellow = 'rgb(220, 220, 40)';
+const green = 'rgb(20, 160, 20)';
+const blue = 'rgb(40, 80, 240)';
 const degrees = [
     [-45, 0, 45],
     [-90, 0, 90],
@@ -16,7 +16,7 @@ var prevGridRowStart = -1,
     prevGridColumnStart = -1;
 
 function isValidTouch(touch) {
-    return touch && touch.className === 'touch';
+    return touch && touch.className === 'cell-touch';
 }
 
 function hasValidId(target) {
@@ -42,6 +42,10 @@ function evaluateDegrees(target) {
 }
 
 function resetGrid() {
+    if (pressedCells.length > 0) {
+        pressedCells[pressedCells.length - 1].style.margin = '';
+        pressedCells[pressedCells.length - 1].childNodes[0].childNodes[0].style.fontSize = '';
+    }
     pressedCells.forEach(cell => setCellNotPressed(cell));
     pressedCells = [];
 }
@@ -53,16 +57,20 @@ function setCellNotPressed(target) {
 }
 
 function setCellPressed(target) {
+    target.style.margin = '1vmin';
+    target.childNodes[0].childNodes[0].style.fontSize = '13vmin';
     target.childNodes[1].style.display = '';
-    if (prevGridRowStart !== -1) {
+    if (prevGridRowStart > -1) {
+        pressedCells[pressedCells.length - 2].style.margin = '';
+        pressedCells[pressedCells.length - 2].childNodes[0].childNodes[0].style.fontSize = '';
         target.childNodes[2].style.display = '';
-        target.childNodes[2].className = 'lineShort';
+        target.childNodes[2].className = 'cell-line short';
         target.childNodes[2].style.transform = 'rotate(' + evaluateDegrees(target) + 'deg)'
     }
 }
 
 function setCellColor(target, color) {
-    target.style.borderColor = color;
+    target.childNodes[0].style.borderColor = color;
     target.style.color = color;
 }
 
@@ -84,21 +92,25 @@ function updateCellsColor(word, target) {
 }
 
 export function initializeGrid(board) {
-    for (var x = 1; x <= 4; x++)
-        for (var y = 1; y <= 4; y++) {
+    for (var x = 0; x < 4; x++)
+        for (var y = 0; y < 4; y++) {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.style.gridRowStart = x;
-            cell.style.gridColumnStart = y;
-            cell.id = 4 * x + y - 5;
+            cell.style.gridRowStart = x + 1;
+            cell.style.gridColumnStart = y + 1;
+            cell.id = 4 * x + y;
 
             const letter = document.createElement('div');
-            letter.className = 'letter';
-            letter.innerHTML = board[x - 1][y - 1];
+            letter.className = 'cell-letter';
             cell.appendChild(letter);
 
+            const text = document.createElement('p');
+            text.className = 'cell-letter-text';
+            text.innerHTML = board[x][y];
+            letter.appendChild(text);
+
             const dot = document.createElement('div');
-            dot.className = 'dot';
+            dot.className = 'cell-line dot';
             dot.style.display = 'none';
             cell.appendChild(dot);
 
@@ -107,7 +119,7 @@ export function initializeGrid(board) {
             cell.appendChild(line);
 
             const touch = document.createElement('div');
-            touch.className = 'touch';
+            touch.className = 'cell-touch';
             cell.appendChild(touch);
 
             gridElement.appendChild(cell);
@@ -122,7 +134,7 @@ export function press(e) {
     if (isValidTouch(touch) && hasValidId(touch.parentNode)) {
         const target = touch.parentNode;
         pressedCells.push(target);
-        addLetter(target.childNodes[0].innerHTML);
+        addLetter(target.childNodes[0].childNodes[0].innerHTML);
         setCellPressed(target);
         updateCellsColor(getWord(), target);
         prevGridRowStart = target.style.gridRowStart;

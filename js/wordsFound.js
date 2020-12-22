@@ -4,10 +4,10 @@ var wordStarts;
 
 export function addWordFound(word) {
     wordsFound.push(word);
-    // const wordFoundElement = document.createElement('div');
-    // wordFoundElement.className = 'word-found';
-    // wordFoundElement.innerHTML = word;
-    // wordsFoundElement.appendChild(wordFoundElement);
+    const wordFoundElement = document.createElement('div');
+    wordFoundElement.className = 'word-found';
+    wordFoundElement.innerHTML = word;
+    wordsFoundElement.appendChild(wordFoundElement);
 }
 
 export function wordNotFound(word) {

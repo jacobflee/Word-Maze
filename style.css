@@ -22,18 +22,19 @@ body {
 #info-game {
     display: flex;
     flex-flow: row wrap;
-    width: 80vmin;
+    width: 85vmin;
 }
 
 #word-current {
     flex: 2;
     font-size: 6vmin;
+    font-weight: 350;
     text-align: center;
 }
 
 #score {
     flex: 1;
-    font-size: 7vmin;
+    font-size: 7.5vmin;
     font-weight: 600;
     text-align: center;
     color: yellow;
@@ -41,11 +42,9 @@ body {
 
 #grid {
     touch-action: none;
-    padding: 0.5vmin;
     margin: 2vmin;
-    border: 0.5vmin solid white;
-    width: 80vmin;
-    height: 80vmin;
+    width: 85vmin;
+    height: 85vmin;
     display: grid;
     grid-template-rows: repeat(4, 1fr);
     grid-template-columns: repeat(4, 1fr);
@@ -54,56 +53,57 @@ body {
 .cell {
     position: relative;
     margin: 0.5vmin;
-    border: 0.5vmin solid white;
     display: flex;
     justify-content: center;
     align-items: center;
 }
 
-.letter {
+.cell-letter {
     position: absolute;
-    font-size: 13vmin;
-    font-weight: 240;
+    box-sizing: border-box;
+    border: 0.5vmin solid white;
+    border-radius: 25%;
+    width: 100%;
+    height: 100%;
+    display: table;
+}
+
+.cell-letter-text {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 13.5vmin;
+    font-weight: 250;
+}
+
+.cell-line {
+    position: absolute;
+    z-index: 1;
+    width: 237%;
+    height: 12%;
+    background-size: 99%;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 .dot {
-    position: absolute;
-    z-index: 1;
-    width: 237%;
-    height: 12%;
-    background-size: 99%;
-    background-repeat: no-repeat;
-    background-position: center;
-    background-image: url("./assets/dot.svg");
+    background-image: url("./assets/lineDot.svg");
 }
 
-.lineShort {
-    position: absolute;
-    z-index: 1;
-    width: 237%;
-    height: 12%;
-    background-size: 99%;
-    background-repeat: no-repeat;
-    background-position: center;
+.short {
     background-image: url("./assets/lineShort.svg");
 }
 
-.lineLong {
-    position: absolute;
-    z-index: 1;
-    width: 237%;
-    height: 12%;
-    background-size: 99%;
-    background-repeat: no-repeat;
-    background-position: center;
+.long {
     background-image: url("./assets/lineLong.svg");
 }
 
-.touch {
+.cell-touch {
     position: absolute;
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
+    z-index: 2;
+    width: 90%;
+    height: 90%;
+    border-radius: 40%;
 }
 
 #words-found {
@@ -114,6 +114,6 @@ body {
 }
 
 .word-found {
-    font-size: 5vmin;
-    font-weight: 250;
+    font-weight: 300;
+    font-size: 6vmin;
 }
