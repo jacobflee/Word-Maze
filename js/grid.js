@@ -13,8 +13,17 @@ var prevGridRowStart = -1,
 new ResizeObserver(resizeSVG).observe(document.body);
 
 function resizeSVG() {
-    svg.setAttribute('width', document.body.clientWidth);
-    svg.setAttribute('height', document.body.clientHeight);
+    svg.style.width = document.body.clientWidth;
+    svg.style.height = document.body.clientHeight;
+}
+
+function setLineColor(color) {
+    svg.style.fill = color;
+    svg.style.stroke = color;
+}
+
+function lineColorEquals(color) {
+    return svg.style.fill === color;
 }
 
 function getTouch(e) {
@@ -36,7 +45,7 @@ function hasValidId(target) {
 }
 
 function pressedCellsColorEquals(color) {
-    return pressedCells[0] && pressedCells[0].style.color == color;
+    return pressedCells[0] && pressedCells[0].style.color === color;
 }
 
 function resetGrid() {
@@ -49,10 +58,10 @@ function resetGrid() {
 
 function setCellPressed(target) {
     setLetterPushedIn(target.childNodes[0]);
-    addCircle(target, 'white');
+    addCircle(target);
     if (prevGridRowStart > -1) {
         setLetterPushedOut(pressedCells[pressedCells.length - 2].childNodes[0]);
-        addLine(pressedCells[pressedCells.length - 2], target, 'white');
+        addLine(pressedCells[pressedCells.length - 2], target);
     }
 }
 
@@ -83,38 +92,35 @@ function setCellsColor(target, color) {
 }
 
 function updateCellsColor(word, target) {
-    if (isWord(word))
+    if (isWord(word)) {
+        if (lineColorEquals(''))
+            setLineColor('white');
         if (wordNotFound(word))
             setCellsColor(target, green);
         else
             setCellsColor(target, yellow);
-    else
+    } else {
+        if (lineColorEquals('white'))
+            setLineColor('');
         setCellsColor(target, blue);
+    }
 }
 
-function addCircle(cell, color) {
+function addCircle(cell) {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-    var x = cell.offsetLeft + cell.clientWidth / 2;
-    var y = cell.offsetTop + cell.clientHeight / 2;
-    circle.setAttribute('fill', color);
-    circle.setAttribute('cx', x);
-    circle.setAttribute('cy', y);
+    circle.setAttribute('cx', cell.offsetLeft + cell.clientWidth / 2);
+    circle.setAttribute('cy', cell.offsetTop + cell.clientHeight / 2);
     circle.setAttribute('r', cell.clientWidth / 13);
     svg.appendChild(circle);
 }
 
-function addLine(cell1, cell2, color) {
+function addLine(cell1, cell2) {
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    var x1 = cell1.offsetLeft + cell1.clientWidth / 2;
-    var y1 = cell1.offsetTop + cell1.clientHeight / 2;
-    var x2 = cell2.offsetLeft + cell2.clientWidth / 2;
-    var y2 = cell2.offsetTop + cell2.clientHeight / 2;
     line.setAttribute('stroke-width', cell1.clientWidth / 6.5);
-    line.setAttribute('stroke', color);
-    line.setAttribute('x1', x1);
-    line.setAttribute('y1', y1);
-    line.setAttribute('x2', x2);
-    line.setAttribute('y2', y2);
+    line.setAttribute('x1', cell1.offsetLeft + cell1.clientWidth / 2);
+    line.setAttribute('y1', cell1.offsetTop + cell1.clientHeight / 2);
+    line.setAttribute('x2', cell2.offsetLeft + cell2.clientWidth / 2);
+    line.setAttribute('y2', cell2.offsetTop + cell2.clientHeight / 2);
     svg.appendChild(line);
 }
 
