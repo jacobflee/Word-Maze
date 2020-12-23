@@ -1,6 +1,6 @@
-import { addLetter, clearWord, getWord } from './wordCurrent.js';
+import { addLetter, clearWord, getWord, updateCurrentWord } from './wordCurrent.js';
 import { addWordFound, wordNotFound, isWord } from './wordsFound.js';
-import { addPoints } from './score.js';
+import { addPoints, getWordValue } from './score.js';
 
 const svg = document.getElementById('svg');
 const gridElement = document.getElementById('grid');
@@ -91,18 +91,22 @@ function setCellsColor(target, color) {
         setCellColor(target, color);
 }
 
-function updateCellsColor(word, target) {
+function updateCellsANDWordColor(word, target) {
     if (isWord(word)) {
         if (lineColorEquals(''))
             setLineColor('white');
-        if (wordNotFound(word))
+        if (wordNotFound(word)) {
             setCellsColor(target, green);
-        else
+            updateCurrentWord(green, getWordValue(pressedCells.length));
+        } else {
             setCellsColor(target, yellow);
+            updateCurrentWord(yellow, 0);
+        }
     } else {
         if (lineColorEquals('white'))
             setLineColor('');
         setCellsColor(target, blue);
+        updateCurrentWord('', 0);
     }
 }
 
@@ -158,9 +162,9 @@ export function press(e) {
     if (isValidTouch(touch) && hasValidId(touch.parentNode)) {
         const target = touch.parentNode;
         pressedCells.push(target);
-        addLetter(target.childNodes[0].childNodes[0].innerHTML);
         setCellPressed(target);
-        updateCellsColor(getWord(), target);
+        addLetter(target.childNodes[0].childNodes[0].innerHTML);
+        updateCellsANDWordColor(getWord(), target);
         prevGridRowStart = target.style.gridRowStart;
         prevGridColumnStart = target.style.gridColumnStart;
     }
@@ -169,7 +173,7 @@ export function press(e) {
 export function release() {
     if (pressedCellsColorEquals(green)) {
         addWordFound(getWord());
-        addPoints(pressedCells.length);
+        addPoints(getWordValue(pressedCells.length));
     }
     clearWord();
     resetGrid();
