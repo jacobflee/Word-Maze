@@ -49,8 +49,8 @@ function pressedCellsColorEquals(color) {
 }
 
 function resetGrid() {
-    if (pressedCells.length > 0)
-        setLetterPushedOut(pressedCells[pressedCells.length - 1].childNodes[0]);
+    // if (pressedCells.length > 0)
+    //     setLetterPushedOut(pressedCells[pressedCells.length - 1].childNodes[0]);
     pressedCells.forEach(cell => setCellColor(cell, ''));
     pressedCells = [];
     svg.innerHTML = '';
@@ -60,7 +60,7 @@ function setCellPressed(target) {
     setLetterPushedIn(target.childNodes[0]);
     addCircle(target);
     if (prevGridRowStart > -1) {
-        setLetterPushedOut(pressedCells[pressedCells.length - 2].childNodes[0]);
+        // setLetterPushedOut(pressedCells[pressedCells.length - 2].childNodes[0]);
         addLine(pressedCells[pressedCells.length - 2], target);
     }
 }
@@ -69,17 +69,27 @@ function setLetterPushedIn(target) {
     target.style.width = '93%';
     target.style.height = '93%';
     target.style.borderRadius = '30%';
-    // target.childNodes[0].style.fontWeight = '350';
+    target.childNodes[0].style.fontWeight = '350';
     target.childNodes[0].style.fontSize = '12.5vmin';
+    setLetterPushedOut(target, 0);
 
 }
 
-function setLetterPushedOut(target) {
-    target.style.width = '';
-    target.style.height = '';
-    target.style.borderRadius = '';
-    // target.childNodes[0].style.fontWeight = '';
-    target.childNodes[0].style.fontSize = '';
+function setLetterPushedOut(target, count) {
+    if (count < 100) {
+        setTimeout(() => setLetterPushedOut(target, count + 1), 1);
+        target.style.width = ''; //7
+        target.style.height = ''; //7
+        target.style.borderRadius = ''; //-5
+        target.childNodes[0].style.fontWeight = ''; //-100
+        target.childNodes[0].style.fontSize = ''; //1
+    } else {
+        target.style.width = '';
+        target.style.height = '';
+        target.style.borderRadius = '';
+        target.childNodes[0].style.fontWeight = '';
+        target.childNodes[0].style.fontSize = '';
+    }
 }
 
 function setCellColor(target, color) {

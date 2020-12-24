@@ -24,17 +24,31 @@ body {
     z-index: 1;
 }
 
-#title {
-    font-size: 13vmin;
-    font-weight: 200;
+#game-info {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    width: 85vmin;
     margin-top: 2vmin;
 }
 
-#score-info {
-    display: flex;
-    flex-flow: row wrap;
-    width: 85vmin;
-    margin-top: 2vmin;
+#title {
+    font-size: 11vmin;
+    font-weight: 200;
+}
+
+#game-number {
+    margin-left: 2vmin;
+    font-size: 3vmin;
+    font-weight: 400;
+}
+
+#score {
+    flex: 8;
+    font-size: 7.5vmin;
+    font-weight: 600;
+    text-align: center;
+    color: yellow;
 }
 
 #word-current {
@@ -45,21 +59,6 @@ body {
     font-size: 6vmin;
     font-weight: 400;
     text-align: center;
-}
-
-#score {
-    flex: 7;
-    font-size: 6.5vmin;
-    font-weight: 400;
-    text-align: center;
-}
-
-#score-value {
-    flex: 8;
-    font-size: 7.5vmin;
-    font-weight: 600;
-    text-align: center;
-    color: yellow;
 }
 
 #grid {
