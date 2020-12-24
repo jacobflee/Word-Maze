@@ -1,30 +1,41 @@
-const wordCurrentElement = document.getElementById('word-current');
+const wordElement = document.getElementById('word-current');
 var wordCurrent = '';
+
+function fadeWord(opacity) {
+    if (opacity > 0) {
+        wordElement.style.opacity = opacity;
+        setTimeout(() => fadeWord(opacity - 0.05), 1);
+    } else {
+        wordElement.style.backgroundColor = '';
+        wordElement.style.color = '';
+        wordElement.innerHTML = '<br />';
+        wordElement.style.opacity = '';
+    }
+}
 
 export function addLetter(letter) {
     wordCurrent += letter;
 }
 
 export function updateCurrentWord(color, value) {
-    wordCurrentElement.style.backgroundColor = color;
     if (color === '') {
-        wordCurrentElement.style.color = 'white';
-        wordCurrentElement.style.fontWeight = '';
+        wordElement.style.backgroundColor = '';
+        wordElement.style.color = '';
+        wordElement.style.fontWeight = '';
     } else {
-        wordCurrentElement.style.color = 'black';
-        wordCurrentElement.style.fontWeight = 500;
+        wordElement.style.backgroundColor = color;
+        wordElement.style.color = 'black';
+        wordElement.style.fontWeight = 500;
     }
     if (value > 0)
-        wordCurrentElement.innerHTML = wordCurrent + ' (+' + value + ')';
+        wordElement.innerHTML = wordCurrent + ' (+' + value + ')';
     else
-        wordCurrentElement.innerHTML = wordCurrent;
+        wordElement.innerHTML = wordCurrent;
 }
 
 export function clearWord() {
-    wordCurrentElement.style.backgroundColor = 'black';
-    wordCurrentElement.style.color = 'white';
     wordCurrent = '';
-    wordCurrentElement.innerHTML = '<br />';
+    fadeWord(1);
 }
 
 export function getWord() {

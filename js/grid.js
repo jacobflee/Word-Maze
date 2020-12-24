@@ -69,13 +69,16 @@ function setLetterPushedIn(target) {
     target.style.width = '93%';
     target.style.height = '93%';
     target.style.borderRadius = '30%';
-    target.childNodes[0].style.fontSize = '13vmin';
+    // target.childNodes[0].style.fontWeight = '350';
+    target.childNodes[0].style.fontSize = '12.5vmin';
+
 }
 
 function setLetterPushedOut(target) {
     target.style.width = '';
     target.style.height = '';
     target.style.borderRadius = '';
+    // target.childNodes[0].style.fontWeight = '';
     target.childNodes[0].style.fontSize = '';
 }
 
@@ -114,7 +117,7 @@ function addCircle(cell) {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', cell.offsetLeft + cell.clientWidth / 2);
     circle.setAttribute('cy', cell.offsetTop + cell.clientHeight / 2);
-    circle.setAttribute('r', cell.clientWidth / 13);
+    circle.setAttribute('r', cell.clientWidth / 14.75);
     svg.appendChild(circle);
 }
 
