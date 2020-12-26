@@ -17,7 +17,7 @@ export function addLetter(letter) {
     wordCurrent += letter;
 }
 
-export function updateCurrentWord(color, value) {
+export function setWord(color, value) {
     if (color === '') {
         wordElement.style.backgroundColor = '';
         wordElement.style.color = '';

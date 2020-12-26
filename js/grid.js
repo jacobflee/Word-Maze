@@ -1,4 +1,4 @@
-import { addLetter, clearWord, getWord, updateCurrentWord } from './wordCurrent.js';
+import { addLetter, clearWord, getWord, setWord } from './wordCurrent.js';
 import { addWordFound, wordNotFound, isWord } from './wordsFound.js';
 import { addPoints, getWordValue } from './score.js';
 
@@ -7,14 +7,22 @@ const gridElement = document.getElementById('grid');
 const yellow = 'rgb(220, 220, 40)';
 const green = 'rgb(20, 180, 40)';
 const blue = 'rgb(40, 80, 240)';
+var isDown = false;
 var pressedCells = [];
 var prevGridRowStart = -1,
     prevGridColumnStart = -1;
 new ResizeObserver(resizeSVG).observe(document.body);
+declareGrid();
 
 function resizeSVG() {
     svg.style.width = document.body.clientWidth;
     svg.style.height = document.body.clientHeight;
+}
+
+function getTouch(e) {
+    if (e.type === 'mousemove') return document.elementFromPoint(e.clientX, e.clientY);
+    else if (e.type === 'touchmove') return document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
+    else return e.target;
 }
 
 function setLineColor(color) {
@@ -24,16 +32,6 @@ function setLineColor(color) {
 
 function lineColorEquals(color) {
     return svg.style.fill === color;
-}
-
-function getTouch(e) {
-    if (e.type === 'mousemove') return document.elementFromPoint(e.clientX, e.clientY);
-    else if (e.type === 'touchmove') return document.elementFromPoint(e.touches[0].clientX, e.touches[0].clientY);
-    else return e.target;
-}
-
-function isValidTouch(touch) {
-    return touch && touch.className === 'cell-touch';
 }
 
 function hasValidId(target) {
@@ -49,8 +47,6 @@ function pressedCellsColorEquals(color) {
 }
 
 function resetGrid() {
-    // if (pressedCells.length > 0)
-    //     setLetterPushedOut(pressedCells[pressedCells.length - 1].childNodes[0]);
     pressedCells.forEach(cell => setCellColor(cell, ''));
     pressedCells = [];
     svg.innerHTML = '';
@@ -58,31 +54,25 @@ function resetGrid() {
 
 function setCellPressed(target) {
     setLetterPushedIn(target.childNodes[0]);
+    setLetterPushedOut(target.childNodes[0], 0);
     addCircle(target);
-    if (prevGridRowStart > -1) {
-        // setLetterPushedOut(pressedCells[pressedCells.length - 2].childNodes[0]);
-        addLine(pressedCells[pressedCells.length - 2], target);
-    }
+    if (prevGridRowStart > -1) addLine(pressedCells[pressedCells.length - 2], target);
 }
 
 function setLetterPushedIn(target) {
-    target.style.width = '93%';
-    target.style.height = '93%';
-    target.style.borderRadius = '30%';
-    target.childNodes[0].style.fontWeight = '350';
-    target.childNodes[0].style.fontSize = '12.5vmin';
-    setLetterPushedOut(target, 0);
-
+    target.style.width = 0.93;
+    target.style.height = 0.93;
+    target.style.borderRadius = 0.4;
+    target.childNodes[0].style.fontSize = '11.5vmin';
 }
 
 function setLetterPushedOut(target, count) {
-    if (count < 100) {
-        setTimeout(() => setLetterPushedOut(target, count + 1), 1);
-        target.style.width = ''; //7
-        target.style.height = ''; //7
-        target.style.borderRadius = ''; //-5
-        target.childNodes[0].style.fontWeight = ''; //-100
-        target.childNodes[0].style.fontSize = ''; //1
+    if (count < 1) {
+        target.style.width = 93 + 7 * count + '%';
+        target.style.height = target.style.width;
+        target.style.borderRadius = 40 - 15 * count + '%';
+        target.childNodes[0].style.fontSize = 11.5 + 2 * count + 'vmin';
+        setTimeout(() => setLetterPushedOut(target, count + 0.03), 1);
     } else {
         target.style.width = '';
         target.style.height = '';
@@ -98,28 +88,24 @@ function setCellColor(target, color) {
 }
 
 function setCellsColor(target, color) {
-    if (!pressedCellsColorEquals(color))
-        pressedCells.forEach(cell => setCellColor(cell, color));
-    else
-        setCellColor(target, color);
+    if (!pressedCellsColorEquals(color)) pressedCells.forEach(cell => setCellColor(cell, color));
+    else setCellColor(target, color);
 }
 
-function updateCellsANDWordColor(word, target) {
+function setCellsANDWordColor(word, target) {
     if (isWord(word)) {
-        if (lineColorEquals(''))
-            setLineColor('white');
+        if (lineColorEquals('')) setLineColor('white');
         if (wordNotFound(word)) {
             setCellsColor(target, green);
-            updateCurrentWord(green, getWordValue(pressedCells.length));
+            setWord(green, getWordValue(pressedCells.length));
         } else {
             setCellsColor(target, yellow);
-            updateCurrentWord(yellow, 0);
+            setWord(yellow, 0);
         }
     } else {
-        if (lineColorEquals('white'))
-            setLineColor('');
+        if (lineColorEquals('white')) setLineColor('');
         setCellsColor(target, blue);
-        updateCurrentWord('', 0);
+        setWord('', 0);
     }
 }
 
@@ -127,7 +113,7 @@ function addCircle(cell) {
     const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
     circle.setAttribute('cx', cell.offsetLeft + cell.clientWidth / 2);
     circle.setAttribute('cy', cell.offsetTop + cell.clientHeight / 2);
-    circle.setAttribute('r', cell.clientWidth / 14.75);
+    circle.setAttribute('r', cell.clientWidth / 14.5);
     svg.appendChild(circle);
 }
 
@@ -141,7 +127,7 @@ function addLine(cell1, cell2) {
     svg.appendChild(line);
 }
 
-function addCell(x, y, letterText) {
+function declareCell(x, y) {
     const cell = document.createElement('div');
     cell.className = 'cell';
     cell.style.gridRowStart = x + 1;
@@ -152,42 +138,56 @@ function addCell(x, y, letterText) {
     letter.className = 'cell-letter';
     cell.appendChild(letter);
 
-    const text = document.createElement('p');
+    const text = document.createElement('div');
     text.className = 'cell-letter-text';
-    text.innerHTML = letterText;
     letter.appendChild(text);
 
     const touch = document.createElement('div');
     touch.className = 'cell-touch';
+    touch.onmousedown = () => pressCell(cell, isDown = true);
+    touch.onmousemove = () => { if (isDown) pressCell(cell); }
+    touch.ontouchstart = () => pressCell(cell);
+    touch.ontouchmove = (e) => pressCellIfValidTouch(getTouch(e));
     cell.appendChild(touch);
 
     gridElement.appendChild(cell);
 }
 
-export function initializeGrid(board) {
+function declareGrid() {
     for (var x = 0; x < 4; x++)
         for (var y = 0; y < 4; y++)
-            addCell(x, y, board[x][y]);
+            declareCell(x, y);
 }
 
-export function press(e) {
-    var touch = getTouch(e);
-    if (isValidTouch(touch) && hasValidId(touch.parentNode)) {
-        const target = touch.parentNode;
+function initializeCell(cell, board) {
+    cell.childNodes[0].childNodes[0].innerHTML = board[cell.style.gridRowStart - 1][cell.style.gridColumnStart - 1];
+}
+
+export function initializeGrid(board) {
+    gridElement.childNodes.forEach(cell => initializeCell(cell, board));
+}
+
+function pressCellIfValidTouch(touch) {
+    if (touch && touch.className === 'cell-touch') pressCell(touch.parentNode);
+}
+
+function pressCell(target) {
+    if (hasValidId(target)) {
         pressedCells.push(target);
         setCellPressed(target);
         addLetter(target.childNodes[0].childNodes[0].innerHTML);
-        updateCellsANDWordColor(getWord(), target);
+        setCellsANDWordColor(getWord(), target);
         prevGridRowStart = target.style.gridRowStart;
         prevGridColumnStart = target.style.gridColumnStart;
     }
 }
 
-export function release() {
+export function releaseCells() {
     if (pressedCellsColorEquals(green)) {
         addWordFound(getWord());
         addPoints(getWordValue(pressedCells.length));
     }
+    isDown = false;
     clearWord();
     resetGrid();
     prevGridRowStart = -1;

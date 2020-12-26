@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <link rel="icon" href="./assets/favicon.ico" />
     <link rel="apple-touch-icon" href="./assets/logo192.png" />
     <link rel="stylesheet" type="text/css" href="./style.css" />
@@ -15,7 +15,12 @@
     <svg id="svg"></svg>
     <div id="game-info">
         <div id="title">Word Hunt</div>
-        <div id="game-number"></div>
+        <div id="game-number-container">
+            <div id="game-number"></div>
+            <input id="game-number-input" type="number" inputmode="numeric" />
+            <img id="game-number-input-btn" src="./assets/btns/checkmark.png" alt="oops" />
+            <div id="invalid-message">invalid</div>
+        </div>
         <div id="score">0</div>
     </div>
     <div id="word-current"><br /></div>
