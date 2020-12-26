@@ -17,3 +17,16 @@ export function addPoints(wordValue) {
 export function getWordValue(wordLength) {
     return points[wordLength - 3];
 }
+
+export function clearScore() {
+    score = 0;
+    scoreElement.innerHTML = 0;
+}
+
+export function hideScore() {
+    scoreElement.style.display = 'none';
+}
+
+export function showScore() {
+    scoreElement.style.display = '';
+}

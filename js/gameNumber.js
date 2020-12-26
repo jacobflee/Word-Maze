@@ -1,63 +1,54 @@
 import { initializeGrid } from './grid.js';
-import { initializeWords } from './wordsFound.js';
+import { initializeWords, clearWords } from './wordsFound.js';
+import { clearScore, hideScore, showScore } from './score.js';
+import './input.js';
 
 const svg = document.getElementById('svg');
-const scoreElement = document.getElementById('score');
 const gameNumber = document.getElementById('game-number');
 const gameNumberInput = document.getElementById('game-number-input');
 const gameNumberInputBtn = document.getElementById('game-number-input-btn');
 const invalidMessage = document.getElementById('invalid-message');
 svg.onclick = () => exitChangeGameNumberScreen();
 gameNumber.onclick = () => enterChangeGameNumberScreen();
-gameNumberInputBtn.onmousedown = () => pressGameNumberInputBtn();
-gameNumberInputBtn.onmouseup = () => submitGameNumberInput();
-gameNumberInputBtn.ontouchstart = () => pressGameNumberInputBtn();
-gameNumberInputBtn.ontouchend = () => submitGameNumberInput();
-gameNumberInputBtn.ontouchcancel = () => submitGameNumberInput();
+gameNumber.onmouseenter = () => gameNumber.style.opacity = 0.5;
+gameNumber.onmouseleave = () => gameNumber.style.opacity = '';
+gameNumberInputBtn.onclick = () => submitGameNumberInput();
+gameNumberInputBtn.onmouseenter = () => gameNumberInputBtn.style.opacity = 0.5;
+gameNumberInputBtn.onmouseleave = () => gameNumberInputBtn.style.opacity = '';
 
 function submitGameNumberInput() {
     const number = parseInt(gameNumberInput.value);
     if (number >= 1 && number <= 100) {
         initializeGameNumber(number);
-        releaseGameNumberInputBtn();
         exitChangeGameNumberScreen();
-        invalidMessage.style.display = '';
+        clearScore();
+        clearWords();
     } else {
         invalidMessage.style.display = 'block';
         gameNumberInput.value = '';
     }
-    releaseGameNumberInputBtn();
-}
-
-function pressGameNumberInputBtn() {
-    gameNumberInputBtn.style.opacity = 0.5;
-    gameNumberInputBtn.style.height = '6.5vmin';
-}
-
-function releaseGameNumberInputBtn() {
-    gameNumberInputBtn.style.opacity = '';
-    gameNumberInputBtn.style.height = '';
 }
 
 function enterChangeGameNumberScreen() {
     svg.style.backgroundColor = 'black';
     svg.style.zIndex = 3;
     svg.style.opacity = 0.75;
-    scoreElement.style.display = 'none';
     gameNumber.style.display = 'none';
     gameNumberInput.style.display = 'block';
     gameNumberInputBtn.style.display = 'block';
+    hideScore();
 }
 
 function exitChangeGameNumberScreen() {
     svg.style.backgroundColor = '';
     svg.style.zIndex = '';
     svg.style.opacity = '';
-    scoreElement.style.display = '';
     gameNumber.style.display = '';
     gameNumberInput.style.display = '';
     gameNumberInputBtn.style.display = '';
     gameNumberInput.value = '';
+    invalidMessage.style.display = '';
+    showScore();
 }
 
 export function initializeGameNumber(number) {

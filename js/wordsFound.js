@@ -21,3 +21,8 @@ export function isWord(word) {
 export function initializeWords(words) {
     wordStarts = words;
 }
+
+export function clearWords() {
+    wordsFound = [];
+    wordsFoundElement.innerHTML = '';
+}

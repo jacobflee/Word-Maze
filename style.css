@@ -28,11 +28,11 @@ body {
     display: flex;
     align-items: flex-end;
     width: 85vmin;
-    margin-top: 2vmin;
+    margin-top: 2.5vmin;
 }
 
 #title {
-    font-size: 8vmin;
+    font-size: 8.5vmin;
     font-weight: 250;
 }
 
@@ -45,7 +45,7 @@ body {
 #game-number {
     margin-left: 1.5vmin;
     font-size: 3vmin;
-    font-weight: 500;
+    font-weight: 475;
 }
 
 #game-number-input {
@@ -136,7 +136,7 @@ body {
     z-index: 2;
     width: 90%;
     height: 90%;
-    border-radius: 40%;
+    border-radius: 45%;
 }
 
 

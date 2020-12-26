@@ -9,8 +9,8 @@ const green = 'rgb(20, 180, 40)';
 const blue = 'rgb(40, 80, 240)';
 var isDown = false;
 var pressedCells = [];
-var prevGridRowStart = -1,
-    prevGridColumnStart = -1;
+var prevGridRowStart = -1;
+var prevGridColumnStart = -1;
 new ResizeObserver(resizeSVG).observe(document.body);
 declareGrid();
 
@@ -127,44 +127,37 @@ function addLine(cell1, cell2) {
     svg.appendChild(line);
 }
 
-function declareCell(x, y) {
-    const cell = document.createElement('div');
-    cell.className = 'cell';
-    cell.style.gridRowStart = x + 1;
-    cell.style.gridColumnStart = y + 1;
-    cell.id = 4 * x + y;
-
-    const letter = document.createElement('div');
-    letter.className = 'cell-letter';
-    cell.appendChild(letter);
-
-    const text = document.createElement('div');
-    text.className = 'cell-letter-text';
-    letter.appendChild(text);
-
-    const touch = document.createElement('div');
-    touch.className = 'cell-touch';
-    touch.onmousedown = () => pressCell(cell, isDown = true);
-    touch.onmousemove = () => { if (isDown) pressCell(cell); }
-    touch.ontouchstart = () => pressCell(cell);
-    touch.ontouchmove = (e) => pressCellIfValidTouch(getTouch(e));
-    cell.appendChild(touch);
-
-    gridElement.appendChild(cell);
-}
-
 function declareGrid() {
     for (var x = 0; x < 4; x++)
-        for (var y = 0; y < 4; y++)
-            declareCell(x, y);
-}
+        for (var y = 0; y < 4; y++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            cell.style.gridRowStart = x + 1;
+            cell.style.gridColumnStart = y + 1;
+            cell.id = 4 * x + y;
 
-function initializeCell(cell, board) {
-    cell.childNodes[0].childNodes[0].innerHTML = board[cell.style.gridRowStart - 1][cell.style.gridColumnStart - 1];
+            const letter = document.createElement('div');
+            letter.className = 'cell-letter';
+            cell.appendChild(letter);
+
+            const text = document.createElement('div');
+            text.className = 'cell-letter-text';
+            letter.appendChild(text);
+
+            const touch = document.createElement('div');
+            touch.className = 'cell-touch';
+            touch.onmousedown = () => pressCell(cell, isDown = true);
+            touch.onmousemove = () => { if (isDown) pressCell(cell); }
+            touch.ontouchstart = () => pressCell(cell);
+            touch.ontouchmove = (e) => pressCellIfValidTouch(getTouch(e));
+            cell.appendChild(touch);
+
+            gridElement.appendChild(cell);
+        }
 }
 
 export function initializeGrid(board) {
-    gridElement.childNodes.forEach(cell => initializeCell(cell, board));
+    gridElement.childNodes.forEach(cell => cell.childNodes[0].childNodes[0].innerHTML = board[cell.style.gridRowStart - 1][cell.style.gridColumnStart - 1]);
 }
 
 function pressCellIfValidTouch(touch) {
@@ -187,9 +180,9 @@ export function releaseCells() {
         addWordFound(getWord());
         addPoints(getWordValue(pressedCells.length));
     }
-    isDown = false;
     clearWord();
     resetGrid();
+    isDown = false;
     prevGridRowStart = -1;
     prevGridColumnStart = -1;
 }
