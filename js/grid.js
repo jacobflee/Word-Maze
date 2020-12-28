@@ -11,13 +11,7 @@ var isDown = false;
 var pressedCells = [];
 var prevGridRowStart = -1;
 var prevGridColumnStart = -1;
-new ResizeObserver(resizeSVG).observe(document.body);
 declareGrid();
-
-function resizeSVG() {
-    svg.style.width = document.body.clientWidth;
-    svg.style.height = document.body.clientHeight;
-}
 
 function getTouch(e) {
     if (e.type === 'mousemove') return document.elementFromPoint(e.clientX, e.clientY);

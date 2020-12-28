@@ -13,19 +13,24 @@
 
 <body>
     <svg id="svg"></svg>
-    <div id="game-info">
-        <div id="title">Word Hunt</div>
+    <div id="header-content">
+        <div>
+            <div id="title">Word Hunt</div>
+            <div id="options"></div>
+        </div>
         <div id="game-number-container">
             <div id="game-number"></div>
             <input id="game-number-input" type="number" inputmode="numeric" />
             <img id="game-number-input-btn" src="./assets/btns/checkmark.png" alt="oops" />
-            <div id="invalid-message">invalid</div>
+            <div id="game-number-invalid-message">invalid</div>
         </div>
         <div id="score">0</div>
     </div>
-    <div id="word-current"><br /></div>
-    <div id="grid"></div>
-    <div id="words-found"></div>
+    <div id="body-content">
+        <div id="word-current"><br /></div>
+        <div id="grid"></div>
+        <div id="words-found"></div>
+    </div>
 </body>
 
 </html>

@@ -26,3 +26,6 @@ export function clearWords() {
     wordsFound = [];
     wordsFoundElement.innerHTML = '';
 }
+
+for (var i = 0; i < 10; i++)
+    addWordFound('apple');

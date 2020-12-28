@@ -17,18 +17,20 @@ body {
 #svg {
     position: absolute;
     opacity: 40%;
-    width: 100%;
-    height: 100%;
     fill: red;
     stroke: red;
     z-index: 1;
 }
 
-#game-info {
+#header-content {
     display: flex;
     align-items: flex-end;
+    position: fixed;
     width: 85vmin;
-    margin-top: 2.5vmin;
+    padding-top: 2.5vmin;
+    padding-bottom: 2.5vmin;
+    background-color: black;
+    z-index: 4;
 }
 
 #title {
@@ -36,10 +38,19 @@ body {
     font-weight: 250;
 }
 
+#options {
+    display: none;
+    height: 70vmin;
+    border-radius: 2vmin;
+    background-color: black;
+    border: solid 0.5vmin white;
+    opacity: 0.9;
+    position: absolute;
+}
+
 #game-number-container {
     display: flex;
     align-items: center;
-    z-index: 4;
 }
 
 #game-number {
@@ -63,16 +74,16 @@ body {
 
 #game-number-input-btn {
     display: none;
-    margin-left: 2.5vmin;
-    height: 7vmin;
+    margin-left: 3vmin;
+    height: 6vmin;
 }
 
-#invalid-message {
+#game-number-invalid-message {
     display: none;
     align-self: flex-end;
     color: red;
-    margin-left: 2vmin;
-    font-size: 3.25vmin;
+    margin-left: 3vmin;
+    font-size: 3vmin;
 }
 
 #score {
@@ -81,6 +92,12 @@ body {
     font-weight: 600;
     text-align: center;
     color: yellow;
+}
+
+#body-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 #word-current {
