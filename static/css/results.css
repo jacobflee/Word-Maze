@@ -1,0 +1,46 @@
+#resultsContainer {
+    display: flex;
+    flex-direction: column;
+    padding-top: calc(4 * var(--base-unit));
+    font-size: calc(4 * var(--base-unit));
+    gap: calc(4 * var(--base-unit));
+}
+
+#resultsInfo {
+    display: flex;
+}
+
+#resultsInfo>* {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: calc(2 * var(--base-unit));
+}
+
+#resultsScore,
+#resultsLongestWord {
+    text-align: center;
+    font-weight: 700;
+}
+
+#resultsScore {
+    color: #FF0;
+}
+
+#chart {
+    display: flex;
+    flex-direction: column;
+    gap: calc(2 * var(--base-unit));
+}
+
+.bar {
+    display: flex;
+    align-items: center;
+    gap: calc(2 * var(--base-unit));
+}
+
+.bar-fill {
+    height: calc(4 * var(--base-unit));
+    background-color: #39D;
+    border-left: 1px solid #39D;
+}

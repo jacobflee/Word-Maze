@@ -1,0 +1,76 @@
+#gameSvg {
+    position: absolute;
+    opacity: 0.4;
+    fill: red;
+    stroke: red;
+    z-index: 1;
+    width: 100vw;
+    height: var(--app-height);
+}
+
+#gameContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: calc(4 * var(--base-unit));
+    gap: calc(2 * var(--base-unit));
+}
+
+#gameTimer {
+    font-size: calc(6 * var(--base-unit));
+}
+
+#gameScore {
+    font-size: calc(7.5 * var(--base-unit));
+    font-weight: 600;
+    color: #FF0;
+}
+
+#currentWord {
+    padding: var(--base-unit) calc(2 * var(--base-unit));
+    border-radius: calc(2 * var(--base-unit));
+    font-size: calc(6 * var(--base-unit));
+    font-weight: 400;
+}
+
+#wordCounter {
+    font-size: calc(6 * var(--base-unit));
+}
+
+#gameBoard {
+    width: var(--app-width);
+    height: var(--app-width);
+    touch-action: none;
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.boardCell {
+    position: relative;
+    margin: calc(0.5 * var(--base-unit));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cellLetter {
+    width: 100%;
+    height: 100%;
+    /* position: absolute; */
+    box-sizing: border-box;
+    border: calc(0.65 * var(--base-unit)) solid #fff;
+    border-radius: calc(5 * var(--base-unit));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(13.5 * var(--base-unit));
+}
+
+.cellTouchArea {
+    position: absolute;
+    z-index: 2;
+    width: 90%;
+    height: 90%;
+    border-radius: 45%;
+}
