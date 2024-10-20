@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 139 139">
+	<rect x="5" y="5" width="129" height="129" fill="black" />
+	<rect x="6" y="6" width="127" height="127" fill="white" />
+	<rect x="7" y="7" width="125" height="125" fill="black" />
+
+	<!--  -->
+
+	<rect x="8" y="8" width="30" height="30" fill="white" />
+	<rect x="9" y="9" width="28" height="28" fill="black" />
+
+	<rect x="39" y="8" width="30" height="30" fill="white" />
+	<rect x="40" y="9" width="28" height="28" fill="black" />
+	
+	<rect x="70" y="8" width="30" height="30" fill="white" />
+	<rect x="71" y="9" width="28" height="28" fill="black" />
+
+	<rect x="101" y="8" width="30" height="30" fill="white" />
+	<rect x="102" y="9" width="28" height="28" fill="black" />
+
+	<!--  -->
+
+	<rect x="8" y="39" width="30" height="30" fill="white" />
+	<rect x="9" y="40" width="28" height="28" fill="black" />
+
+	<rect x="39" y="39" width="30" height="30" fill="white" />
+	<rect x="40" y="40" width="28" height="28" fill="black" />
+	
+	<rect x="70" y="39" width="30" height="30" fill="white" />
+	<rect x="71" y="40" width="28" height="28" fill="black" />
+
+	<rect x="101" y="39" width="30" height="30" fill="white" />
+	<rect x="102" y="40" width="28" height="28" fill="black" />
+
+	<!--  -->
+
+	<rect x="8" y="70" width="30" height="30" fill="white" />
+	<rect x="9" y="71" width="28" height="28" fill="black" />
+
+	<rect x="39" y="70" width="30" height="30" fill="white" />
+	<rect x="40" y="71" width="28" height="28" fill="black" />
+	
+	<rect x="70" y="70" width="30" height="30" fill="white" />
+	<rect x="71" y="71" width="28" height="28" fill="black" />
+
+	<rect x="101" y="70" width="30" height="30" fill="white" />
+	<rect x="102" y="71" width="28" height="28" fill="black" />
+
+	<!--  -->
+
+	<rect x="8" y="101" width="30" height="30" fill="white" />
+	<rect x="9" y="102" width="28" height="28" fill="black" />
+
+	<rect x="39" y="101" width="30" height="30" fill="white" />
+	<rect x="40" y="102" width="28" height="28" fill="black" />
+	
+	<rect x="70" y="101" width="30" height="30" fill="white" />
+	<rect x="71" y="102" width="28" height="28" fill="black" />
+
+	<rect x="101" y="101" width="30" height="30" fill="white" />
+	<rect x="102" y="102" width="28" height="28" fill="black" />
+</svg>

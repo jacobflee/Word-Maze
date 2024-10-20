@@ -1,0 +1,225 @@
+/* GLOBAL */
+
+@media only screen and (orientation: portrait) {
+    :root {
+        --base-unit: 1vw;
+    }
+}
+
+@media only screen and (orientation: landscape) {
+    :root {
+        --base-unit: 0.4vw;
+    }
+}
+
+:root {
+    --app-width: calc(84 * var(--base-unit));
+}
+
+body {
+    background: linear-gradient(to bottom, #0d212f 0, black calc(16 * var(--base-unit)));
+    color: white;
+    margin: 0;
+    font-family: "Cousine", monospace;
+    display: flex;
+    justify-content: center;
+    height: var(--app-height);
+    font-size: calc(4 * var(--base-unit));
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.screen {
+    width: var(--app-width);
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: calc(4 * var(--base-unit)) 0;
+    height: calc(16 * var(--base-unit));
+    box-sizing: border-box;
+}
+
+button,
+input {
+    font-family: "Cousine", monospace;
+    color: white;
+    font-size: calc(4 * var(--base-unit));
+}
+
+.back-button {
+    background-color: black;
+    border: calc(0.5 * var(--base-unit)) solid #0d212f;
+    /* border: 0; */
+    padding: var(--base-unit) calc(4 * var(--base-unit));
+    border-radius: calc(2 * var(--base-unit));
+    display: flex;
+    z-index: 1;
+}
+
+/* MENU */
+
+#main-menu-screen {
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: calc(8 * var(--base-unit));
+}
+
+#game-title {
+    font-size: calc(6 * var(--base-unit));
+    font-weight: 700;
+}
+
+#username-form {
+    display: flex;
+}
+
+#username-form input {
+    background-color: transparent;
+    border: 0;
+    text-align: center;
+    outline: none;
+}
+
+.game-mode-button {
+    height: calc(12 * var(--base-unit));
+    border: 0;
+    background: linear-gradient(to right, black, #0d212f);
+    border-radius: calc(4 * var(--base-unit));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.game-mode-icon {
+    position: absolute;
+    left: 0;
+    width: calc(12 * var(--base-unit));
+}
+
+/* GAME */
+
+#game-svg {
+    position: absolute;
+    top: 0;
+    opacity: 0.4;
+    fill: red;
+    stroke: red;
+    z-index: 1;
+    width: 100vw;
+    height: var(--app-height);
+}
+
+#game-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: calc(2 * var(--base-unit));
+}
+
+#game-timer,
+#word-counter,
+#current-word {
+    font-size: calc(6 * var(--base-unit));
+}
+
+#game-score {
+    font-size: calc(7.5 * var(--base-unit));
+    font-weight: 700;
+    color: yellow;
+}
+
+#current-word {
+    padding: var(--base-unit) calc(2 * var(--base-unit));
+    border-radius: calc(2 * var(--base-unit));
+}
+
+#game-board {
+    width: var(--app-width);
+    height: var(--app-width);
+    touch-action: none;
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+}
+
+.board-cell {
+    position: relative;
+    margin: calc(0.5 * var(--base-unit));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.cell-letter {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: calc(0.65 * var(--base-unit)) solid white;
+    border-radius: calc(5 * var(--base-unit));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: calc(13.5 * var(--base-unit));
+}
+
+.cell-touch-area {
+    position: absolute;
+    z-index: 1;
+    width: 90%;
+    height: 90%;
+    border-radius: 45%;
+}
+
+/* RESULTS */
+
+#results-screen {
+    display: flex;
+    flex-direction: column;
+    gap: calc(4 * var(--base-unit));
+}
+
+#results-summary {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: calc(2 * var(--base-unit));
+}
+
+#final-score,
+#longest-word {
+    text-align: center;
+    font-weight: 700;
+}
+
+#final-score {
+    color: #FFFF00;
+}
+
+#results-chart {
+    display: flex;
+    flex-direction: column;
+    gap: calc(2 * var(--base-unit));
+}
+
+.bar {
+    display: flex;
+    align-items: center;
+    gap: calc(2 * var(--base-unit));
+}
+
+.bar-fill {
+    height: calc(4 * var(--base-unit));
+    background-color: #3399DD;
+    border-left: 1px solid #3399DD;
+}

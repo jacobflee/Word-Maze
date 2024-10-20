@@ -3,89 +3,224 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine:wght@400;700&display=swap">
-    <link rel="stylesheet" type="text/css" href="./static/css/global.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/menu.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/game.css" />
-    <link rel="stylesheet" type="text/css" href="./static/css/results.css" />
+
+    <link rel="stylesheet" type="text/css" href="./static/css/styles.css">
+
     <link rel="icon" type="image/svg+xml" href="./static/assets/favicon.svg">
-    <link rel="apple-touch-icon" href="./assets/logo192.png" />
+    <link rel="icon" type="image/x-icon" href="./static/assets/favicon.ico">
+
+    <link rel="apple-touch-icon" type="image/svg+xml" href="./static/assets/logo.svg" />
+    <link rel="apple-touch-icon" type="image/png" href="./static/assets/logo.png" />
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script type="module" src="./static/js/main.js" defer></script>
+
     <title>Word Maze</title>
 </head>
 
 <body>
-    <svg id="gameSvg"></svg>
-
-    <div id="mainMenuContainer" class="pageContainer">
+    <div id="main-menu-screen" class="screen">
         <header>
-            <span id="gameTitle">Word Maze</span>
-            <form id="usernameForm">
-                <input type="text" placeholder="create username" onInput="this.style.width = `${Math.max(this.value.length, 15)}ch`">
+            <span id="game-title">Word Maze</span>
+            <form id="username-form">
+                <input type="text" name="username" placeholder="create username">
             </form>
         </header>
-        <button class="gameModeButton">
-            <span class="gameModeIcon">
+        <button class="game-mode-button" data-game-mode="Timed">
+            <span class="game-mode-icon">
                 <i class="far fa-clock"></i>
             </span>
-            <span class="gameModeText">Timed</span>
+            <span class="game-mode-name">Timed</span>
         </button>
-        <button class="gameModeButton">
-            <span class="gameModeIcon">
+        <button class="game-mode-button" data-game-mode="Free Play">
+            <span class="game-mode-icon">
                 <i class="far fa-circle"></i>
             </span>
-            <span class="gameModeText">Free Play</span>
+            <span class="game-mode-name">Free Play</span>
         </button>
-        <button class="gameModeButton">
-            <span class="gameModeIcon">
+        <button class="game-mode-button" data-game-mode="VS Friend">
+            <span class="game-mode-icon">
                 <i class="fas fa-user-friends"></i>
             </span>
-            <span class="gameModeText">VS Friend</span>
+            <span class="game-mode-name">VS Friend</span>
         </button>
-        <button class="gameModeButton">
-            <span class="gameModeIcon">
+        <button class="game-mode-button" data-game-mode="VS Random">
+            <span class="game-mode-icon">
                 <i class="fas fa-question"></i>
             </span>
-            <span class="gameModeText">VS Random</span>
+            <span class="game-mode-name">VS Random</span>
         </button>
     </div>
 
-    <div id="gameContainer" class="pageContainer">
+    <div id="game-screen" class="screen">
+        <svg id="game-svg"></svg>
         <header>
-            <button class="backButton">
+            <button class="back-button">
                 <i class="fas fa-arrow-left"></i>
             </button>
-            <div id="gameTimer"></div>
-            <div id="wordCounter">Words: 0</div>
+            <div id="game-timer"></div>
+            <div id="word-counter">Words: 0</div>
         </header>
-        <div id="gameScore">0</div>
-        <div id="currentWord"><br></div>
-        <div id="gameBoard"></div>
-    </div>
-
-    <div id="resultsContainer" class="pageContainer">
-        <header>
-            <button class="backButton">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-        </header>
-        <div id="resultsInfo">
-            <div>
-                <div>Score:</div>
-                <div>Longest Word:</div>
+        <div id="game-score">0</div>
+        <div id="current-word"><br></div>
+        <div id="game-board">
+            <div class="board-cell" style="grid-area: 1 / 1;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
             </div>
-            <div>
-                <div id="resultsScore"></div>
-                <div id="resultsLongestWord"></div>
+            <div class="board-cell" style="grid-area: 1 / 2;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 1 / 3;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 1 / 4;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 2 / 1;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 2 / 2;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 2 / 3;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 2 / 4;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 3 / 1;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 3 / 2;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 3 / 3;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 3 / 4;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 4 / 1;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 4 / 2;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 4 / 3;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
+            </div>
+            <div class="board-cell" style="grid-area: 4 / 4;">
+                <div class="cell-letter"></div>
+                <div class="cell-touch-area"></div>
             </div>
         </div>
-        <div id="chart"></div>
     </div>
 
-    <script type="module" src="./static/js/menu.js"></script>
+    <div id="results-screen" class="screen">
+        <header>
+            <button class="back-button">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div>Results</div>
+            <button class="back-button" style="visibility: hidden;">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </header>
+        <div id="results-summary">
+            <div>Score:</div>
+            <div id="final-score"></div>
+            <div>Longest Word:</div>
+            <div id="longest-word"></div>
+        </div>
+        <div id="results-chart">
+            <div>Word Length Distribution:</div>
+            <div class="bar">
+                <div>&nbsp;3</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>&nbsp;4</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>&nbsp;5</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>&nbsp;6</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>&nbsp;7</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>&nbsp;8</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>&nbsp;9</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>10</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>11</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>12</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>13</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>14</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+            <div class="bar">
+                <div>15</div>
+                <div class="bar-fill"></div>
+                <div class="bar-value"></div>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
