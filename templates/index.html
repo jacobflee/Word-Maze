@@ -17,207 +17,211 @@
     <link rel="apple-touch-icon" type="image/svg+xml" href="./static/assets/logo.svg" />
     <link rel="apple-touch-icon" type="image/png" href="./static/assets/logo.png" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js"></script>
     <script type="module" src="./static/js/main.js" defer></script>
 
     <title>Word Maze</title>
 </head>
 
 <body>
-    <div id="main-menu-screen" class="screen">
+    <!--................................HOME SCREEN................................-->
+    <div id="home-screen" class="screen">
         <header>
-            <span id="game-title">Word Maze</span>
+            <h4>Word Maze</h4>
             <form id="username-form">
-                <input type="text" name="username" placeholder="create username">
+                <input type="text" id="username" name="username" placeholder="create username" autocomplete="off">
             </form>
         </header>
-        <button class="game-mode-button" data-game-mode="Timed">
-            <span class="game-mode-icon">
+        <button class="mode-select-btn" data-mode="Timed">
+            <span class="mode-icon">
                 <i class="far fa-clock"></i>
             </span>
-            <span class="game-mode-name">Timed</span>
+            <span>Timed</span>
         </button>
-        <button class="game-mode-button" data-game-mode="Free Play">
-            <span class="game-mode-icon">
+        <button class="mode-select-btn" data-mode="Free Play">
+            <span class="mode-icon">
                 <i class="far fa-circle"></i>
             </span>
-            <span class="game-mode-name">Free Play</span>
+            <span>Free Play</span>
         </button>
-        <button class="game-mode-button" data-game-mode="VS Friend">
-            <span class="game-mode-icon">
+        <button class="mode-select-btn" data-mode="VS Friend">
+            <span class="mode-icon">
                 <i class="fas fa-user-friends"></i>
             </span>
-            <span class="game-mode-name">VS Friend</span>
+            <span>VS Friend</span>
         </button>
-        <button class="game-mode-button" data-game-mode="VS Random">
-            <span class="game-mode-icon">
+        <button class="mode-select-btn" data-mode="VS Random">
+            <span class="mode-icon">
                 <i class="fas fa-question"></i>
             </span>
-            <span class="game-mode-name">VS Random</span>
+            <span>VS Random</span>
         </button>
     </div>
 
+    <!--................................GAME SCREEN................................-->
     <div id="game-screen" class="screen">
-        <svg id="game-svg"></svg>
+        <svg id="letter-path"></svg>
         <header>
-            <button class="back-button">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <div id="game-timer"></div>
-            <div id="word-counter">Words: 0</div>
+            <div>
+                <button class="home-btn">
+                    <i class="fa-solid fa-house"></i>
+                </button>
+                <button class="results-btn">
+                    <i class="fa-solid fa-square-poll-horizontal"></i>
+                </button>
+            </div>
+            <div id="countdown-timer"></div>
+            <div id="word-counter"></div>
         </header>
-        <div id="game-score">0</div>
-        <div id="current-word"><br></div>
+        <div id="current-score"></div>
+        <div id="selected-letters"><br></div>
         <div id="game-board">
-            <div class="board-cell" style="grid-area: 1 / 1;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 1 / 1;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 1 / 2;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 1 / 2;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 1 / 3;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 1 / 3;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 1 / 4;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 1 / 4;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 2 / 1;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 2 / 1;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 2 / 2;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 2 / 2;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 2 / 3;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 2 / 3;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 2 / 4;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 2 / 4;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 3 / 1;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 3 / 1;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 3 / 2;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 3 / 2;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 3 / 3;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 3 / 3;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 3 / 4;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 3 / 4;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 4 / 1;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 4 / 1;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 4 / 2;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 4 / 2;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 4 / 3;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 4 / 3;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
-            <div class="board-cell" style="grid-area: 4 / 4;">
-                <div class="cell-letter"></div>
-                <div class="cell-touch-area"></div>
+            <div class="cell" style="grid-area: 4 / 4;">
+                <div class="letter"></div>
+                <div class="touch-target"></div>
             </div>
         </div>
     </div>
 
+    <!--................................RESULTS SCREEN................................-->
     <div id="results-screen" class="screen">
         <header>
-            <button class="back-button">
-                <i class="fas fa-arrow-left"></i>
-            </button>
-            <div>Results</div>
-            <button class="back-button" style="visibility: hidden;">
-                <i class="fas fa-arrow-left"></i>
+            <button class="home-btn">
+                <i class="fa-solid fa-house"></i>
             </button>
         </header>
-        <div id="results-summary">
+        <div id="game-recap">
             <div>Score:</div>
             <div id="final-score"></div>
             <div>Longest Word:</div>
             <div id="longest-word"></div>
         </div>
-        <div id="results-chart">
+        <div id="word-length-chart">
             <div>Word Length Distribution:</div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;3</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;4</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;5</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;6</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;7</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;8</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>&nbsp;9</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>10</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>11</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>12</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>13</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>14</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
-            <div class="bar">
+            <div class="chart-bar">
                 <div>15</div>
                 <div class="bar-fill"></div>
-                <div class="bar-value"></div>
+                <div class="bar-count"></div>
             </div>
         </div>
     </div>

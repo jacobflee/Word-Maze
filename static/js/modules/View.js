@@ -1,253 +1,167 @@
-import { Utils } from './Utils.js'
-
-
-export const View = (() => {
-    const ELEMENTS = {
-        screens: document.querySelectorAll('.screen'),
-        backButtons: document.querySelectorAll('.back-button'),
-
-        mainMenuScreen: document.getElementById('main-menu-screen'),
-        usernameForm: document.getElementById('username-form'),
-        usernameInput: document.querySelector('#username-form input'),
-        gameModeButtons: document.querySelectorAll('.game-mode-button'),
-
-        gameScreen: document.getElementById('game-screen'),
-        gameSvg: document.getElementById('game-svg'),
-        gameTimer: document.getElementById('game-timer'),
-        wordCounter: document.getElementById('word-counter'),
-        gameScore: document.getElementById('game-score'),
-        currentWord: document.getElementById('current-word'),
-        gameBoard: document.getElementById('game-board'),
-        cellLetters: document.querySelectorAll('.cell-letter'),
-        cellTouchAreas: document.querySelectorAll('.cell-touch-area'),
-
-        resultsScreen: document.getElementById('results-screen'),
-        finalScore: document.getElementById('final-score'),
-        longestWord: document.getElementById('longest-word'),
-        barFills: document.querySelectorAll('.bar-fill'),
-        barValues: document.querySelectorAll('.bar-value'),
-    };
-
-    function init() {
-        setAppHeight();
-        setUsername();
-        setUsernameInputWidth();
-        returnToMainMenu();
+export class View {
+    /*................................GLOBAL................................*/
+    
+    constructor() {
+        this.screens = document.querySelectorAll('.screen');
+        this.homeBtns = document.querySelectorAll('.home-btn');
+        this.homeScreen = document.getElementById('home-screen');
+        this.usernameForm = document.getElementById('username-form');
+        this.usernameInput = document.getElementById('username');
+        this.modeSelectBtns = document.querySelectorAll('.mode-select-btn');
+        this.gameScreen = document.getElementById('game-screen');
+        this.letterPath = document.getElementById('letter-path');
+        this.countdownTimer = document.getElementById('countdown-timer');
+        this.wordCounter = document.getElementById('word-counter');
+        this.currentScore = document.getElementById('current-score');
+        this.selectedLetters = document.getElementById('selected-letters');
+        this.gameBoard = document.getElementById('game-board');
+        this.letters = document.querySelectorAll('.letter');
+        this.touchTargets = document.querySelectorAll('.touch-target');
+        this.resultsScreen = document.getElementById('results-screen');
+        this.finalScore = document.getElementById('final-score');
+        this.longestWord = document.getElementById('longest-word');
+        this.barFills = document.querySelectorAll('.bar-fill');
+        this.barCounts = document.querySelectorAll('.bar-count');
     }
 
-    function setAppHeight() {
+    setAppHeight() {
         document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
     }
 
-    function setUsername() {
-        ELEMENTS.usernameInput.value = localStorage.getItem('username');
-    }
-
-    function setUsernameInputWidth() {
-        ELEMENTS.usernameInput.style.width = `${Math.max(ELEMENTS.usernameInput.value.length, 15)}ch`;
-    }
-
-    function returnToMainMenu() {
-        changeScreen(ELEMENTS.mainMenuScreen);
-    }
-
-    function changeScreen(screen) {
-        ELEMENTS.screens.forEach((screen) => screen.style.display = 'none');
+    changeScreen(screen) {
+        this.screens.forEach((screen) => screen.style.display = 'none');
         screen.style.display = '';
     }
 
-    function selectTimed() {
-        ELEMENTS.backButtons.forEach((backButton) => backButton.style.display = 'none');
-        ELEMENTS.gameTimer.style.display = '';
-        changeScreen(ELEMENTS.gameScreen);
+    setHomeBtnsDisplay(display) {
+        this.homeBtns.forEach((homeBtn) => homeBtn.style.display = display);
     }
 
-    function selectFreePlay() {
-        ELEMENTS.backButtons.forEach((backButton) => backButton.style.display = '');
-        ELEMENTS.gameTimer.style.display = 'none';
-        changeScreen(ELEMENTS.gameScreen);
-    }
 
-    function selectVSFriend() {
-        // implement
-    }
-
-    function selectVSRandom() {
-        // implement
-    }
-
-    function updateTimer(secondsRemaining) {
-        ELEMENTS.gameTimer.textContent = Utils.secondsToMSS(secondsRemaining);
-    }
-
-    function displayResults(gameScore, longestWord, wordLengthDistribution, wordCount) {
-        console.log(gameScore);
-        console.log(longestWord);
-        console.log(wordLengthDistribution);
-        console.log(wordCount);
-        ELEMENTS.backButtons.forEach((backButton) => backButton.style.display = '');
-        ELEMENTS.finalScore.textContent = gameScore;
-        ELEMENTS.longestWord.textContent = longestWord;
-        animateBarGraph(wordLengthDistribution, wordCount);
-        changeScreen(ELEMENTS.resultsScreen);
-    }
-
-    function animateBarGraph(wordLengthDistribution, wordCount, frame = 0) {
-        const frames = 80;
-        if (frame > frames) return;
-        const progress = Utils.easeOutQuadratic(frame / frames);
-        for (let i = 0; i < 13; i++) {
-            const barFill = ELEMENTS.barFills[i];
-            const barValue = ELEMENTS.barValues[i];
-            const wordLengthCount = wordLengthDistribution[i + 3];
-            barFill.style.width = `${100 * progress * wordLengthCount / wordCount}%`;
-            barValue.textContent = Math.round(progress * wordLengthCount);
-        }
-        requestAnimationFrame(() => animateBarGraph(wordLengthDistribution, wordCount, frame + 1));
-    }
-
-    function animateCellSelection(cell, frame = 0) {
-        const frames = 12;
-        if (frame > frames) {
-            cell.style.width = '';
-            cell.style.height = '';
-            cell.style.borderRadius = '';
-            cell.style.fontSize = '';
-        } else {
-            const progress = frame / frames;
-            cell.style.width = `${93 + 7 * progress}%`;
-            cell.style.height = cell.style.width;
-            cell.style.borderRadius = `${40 - 15 * progress}%`;
-            cell.style.fontSize = `calc(${11.5 + 2 * progress} * var(--base-unit))`;
-            requestAnimationFrame(() => animateCellSelection(cell, frame + 1));
-        }
-    }
-
-    function getCellFromTouch(touch) {
-        return document.elementFromPoint(touch.clientX, touch.clientY);
-    }
-
-    function populateGameboard(gameboard) {
-        ELEMENTS.cellLetters.forEach((cellLetter, index) => {
-            const row = Math.floor(index / 4);
-            const col = index % 4;
-            cellLetter.textContent = gameboard[row][col];
-        });
-    }
-
-    function drawCircle(cell) {
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', cell.offsetLeft + cell.clientWidth / 2);
-        circle.setAttribute('cy', cell.offsetTop + cell.clientHeight / 2);
-        circle.setAttribute('r', cell.clientWidth / 14.5);
-        ELEMENTS.gameSvg.appendChild(circle);
-    }
+    /*................................HOME SCREEN................................*/
     
-    function drawLine(startCell, endCell) {
+    setUsername(username) {
+        this.usernameInput.value = username;
+    }
+
+    setUsernameWidth() {
+        const length = this.usernameInput.value.length;
+        this.usernameInput.style.width = `${Math.max(length, 15)}ch`;
+    }
+
+    returnToHomeScreen() {
+        this.changeScreen(this.homeScreen);
+    }
+
+    selectTimedMode() {
+        this.setHomeBtnsDisplay('none');
+        this.countdownTimer.style.display = '';
+        this.changeScreen(this.gameScreen);
+    }
+
+    selectFreePlayMode() {
+        this.setHomeBtnsDisplay('');
+        this.countdownTimer.style.display = 'none';
+        this.changeScreen(this.gameScreen);
+    }
+
+    selectVSFriendMode() {
+        // implement
+    }
+
+    selectVSRandomMode() {
+        // implement
+    }
+
+
+    /*................................GAME SCREEN................................*/
+
+    updateCountdownTimer(timeString) {
+        this.countdownTimer.textContent = timeString;
+    }
+
+    setCellStyle(cell, side, radius, fontSize) {
+        cell.style.width = side;
+        cell.style.height = side;
+        cell.style.borderRadius = radius;
+        cell.style.fontSize = fontSize;
+    }
+
+    drawCircle(cx, cy, r) {
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', cx);
+        circle.setAttribute('cy', cy);
+        circle.setAttribute('r', r);
+        this.letterPath.appendChild(circle);
+    }
+
+    drawLine(strokeWidth, x1, y1, x2, y2) {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('stroke-width', startCell.clientWidth / 6.5);
-        line.setAttribute('x1', startCell.offsetLeft + startCell.clientWidth / 2);
-        line.setAttribute('y1', startCell.offsetTop + startCell.clientHeight / 2);
-        line.setAttribute('x2', endCell.offsetLeft + endCell.clientWidth / 2);
-        line.setAttribute('y2', endCell.offsetTop + endCell.clientHeight / 2);
-        ELEMENTS.gameSvg.appendChild(line);
+        line.setAttribute('stroke-width', strokeWidth);
+        line.setAttribute('x1', x1);
+        line.setAttribute('y1', y1);
+        line.setAttribute('x2', x2);
+        line.setAttribute('y2', y2);
+        this.letterPath.appendChild(line);
     }
 
-    function resetGameSvg() {
-        ELEMENTS.gameSvg.innerHTML = '';
+    resetLetterPath() {
+        this.letterPath.innerHTML = '';
     }
 
-    function setGameSvgColor(value) {
-        ELEMENTS.gameSvg.style.fill = value;
-        ELEMENTS.gameSvg.style.stroke = value;
+    setLetterPathColor(value) {
+        this.letterPath.style.fill = value;
+        this.letterPath.style.stroke = value;
     }
 
-    function setCellsColor(selectedCells, cell, color) {
-        const firstCell = selectedCells[0];
-        const cells = firstCell?.style.color === color ? [cell] : selectedCells;
-        cells.forEach((cell) => {
-            cell.querySelector('.cell-letter').style.borderColor = color;
-            cell.style.color = color;
-        });
+    updateWordCount(wordCount) {
+        this.wordCounter.textContent = `Words: ${wordCount}`;
     }
 
-    function updateWordDisplay(currentWordString, color, value) {
-        if (color === '') {
-            ELEMENTS.currentWord.style.backgroundColor = '';
-            ELEMENTS.currentWord.style.color = '';
-            ELEMENTS.currentWord.style.fontWeight = '';
-        } else {
-            ELEMENTS.currentWord.style.backgroundColor = color;
-            ELEMENTS.currentWord.style.color = 'black';
-            ELEMENTS.currentWord.style.fontWeight = 500;
-        }
-        if (value <= 0) {
-            ELEMENTS.currentWord.textContent = currentWordString;
-        } else {
-            ELEMENTS.currentWord.textContent = `${currentWordString} (+${value})`;
-        }
+    setCurrentScore(score) {
+        this.currentScore.textContent = score;
     }
 
-    function updateWordCount(wordCount) {
-        ELEMENTS.wordCounter.textContent = `Words: ${wordCount}`;
+    resetSelectedLetters() {
+        this.selectedLetters.innerHTML = '&nbsp;';
+        this.selectedLetters.style.cssText = '';
     }
 
-    function animateScoreIncrease(score, points, frame = 0) {
-        const frames = 28;
-        if (frame > frames) {
-            ELEMENTS.gameScore.textContent = score + points;
-        } else {
-            const progress = Utils.smoothStep(frame / frames);
-            ELEMENTS.gameScore.textContent = score + Math.floor(points * progress);
-            requestAnimationFrame(() => animateScoreIncrease(score, points, frame + 1));
-        }
+    setSelectedLettersOpacity(opacity) {
+        this.selectedLetters.style.opacity = opacity;
     }
 
-    function resetCellsStyle(selectedCells) {
-        selectedCells.forEach((selectedCell) => {
-            selectedCell.querySelector('.cell-letter').style.borderColor = '';
-            selectedCell.style.color = '';
-        });
+    setSelectedLettersStyle(backgroundColor, color, fontWeight) {
+        this.selectedLetters.style.backgroundColor = backgroundColor;
+        this.selectedLetters.style.color = color;
+        this.selectedLetters.style.fontWeight = fontWeight;
     }
 
-    function animateWordFadeOut(frame = 0) {
-        const frames = 12;
-        if (frame > frames) {
-            ELEMENTS.currentWord.innerHTML = '<br>';
-            ELEMENTS.currentWord.style.backgroundColor = '';
-            ELEMENTS.currentWord.style.color = '';
-            ELEMENTS.currentWord.style.opacity = '';
-        } else {
-            const progress = Utils.smoothStep(frame / frames);
-            ELEMENTS.currentWord.style.opacity = 1 - progress;
-            requestAnimationFrame(() => animateWordFadeOut(frame + 1));
-        }
+    setSelectedLettersText(text) {
+        this.selectedLetters.textContent = text;
     }
 
-    return {
-        ELEMENTS,
-        init,
-        setAppHeight,
-        setUsernameInputWidth,
-        returnToMainMenu,
-        selectTimed,
-        selectFreePlay,
-        selectVSFriend,
-        selectVSRandom,
-        updateTimer,
-        displayResults,
-        populateGameboard,
-        animateCellSelection,
-        getCellFromTouch,
-        drawCircle,
-        drawLine,
-        setGameSvgColor,
-        setCellsColor,
-        updateWordDisplay,
-        updateWordCount,
-        animateScoreIncrease,
-        resetGameSvg,
-        resetCellsStyle,
-        animateWordFadeOut,
-    };
-})();
+    setLetterText(i, text) {
+        this.letters[i].textContent = text;
+    }
+
+    setCellColor(cell, color) {
+        cell.firstElementChild.style.borderColor = color;
+        cell.style.color = color;
+    }
+
+    
+    /*................................RESULTS SCREEN................................*/
+
+    displayResults(currentScore, longestWord) {
+        this.setHomeBtnsDisplay('');
+        this.finalScore.textContent = currentScore;
+        this.longestWord.textContent = longestWord;
+        this.changeScreen(this.resultsScreen);
+    }
+
+    updateChartBar(i, width, count) {
+        this.barFills[i].style.width = width;
+        this.barCounts[i].textContent = count;
+    }
+}

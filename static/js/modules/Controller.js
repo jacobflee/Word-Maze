@@ -1,55 +1,71 @@
-import { Model } from './Model.js'
-import { View } from './View.js'
-import { API } from './API.js'
+import { secondsToMSS, easeOutExponential, smoothStep } from './utils.js'
 
 
-export const Controller = (() => {
-    function init() {
-        setEventListeners();
+export class Controller {
+    constructor(model, view) {
+        this.model = model;
+        this.view = view;
+
+        this.model.resetGameState();
+        this.view.setAppHeight();
+        this.view.returnToHomeScreen();
+        this.setEventListeners();
+        this.setUsername();
     }
 
-    function setEventListeners() {
-        window.addEventListener('resize', View.setAppHeight);
-        View.ELEMENTS.gameModeButtons.forEach((gameModeButton) => {
-            gameModeButton.addEventListener('click', selectGameMode);
-        });
-        View.ELEMENTS.backButtons.forEach((backButton) => {
-            backButton.addEventListener('click', View.returnToMainMenu);
-        });
-        View.ELEMENTS.usernameInput.addEventListener('input', View.setUsernameInputWidth);
-        View.ELEMENTS.usernameForm.addEventListener('submit', updateUsername);
-        View.ELEMENTS.cellTouchAreas.forEach((cellTouchArea) => {
-            const cell = cellTouchArea.parentElement;
-            cellTouchArea.addEventListener('mousedown', () => selectCell(cell, true));
-            cellTouchArea.addEventListener('mousemove', () => selectCell(cell));
-            cellTouchArea.addEventListener('touchstart', () => selectCell(cell, true));
-            cellTouchArea.addEventListener('touchmove', selectTouchedCell);
-        });
-        window.addEventListener('touchcancel', endWordSelection);
-        window.addEventListener('touchend', endWordSelection);
-        window.addEventListener('mouseup', endWordSelection);
+    /*................................GLOBAL................................*/
+    /*................................HOME SCREEN................................*/
+    /*................................GAME SCREEN................................*/
+    
+    setUsername() {
+        const username = this.model.getUsername();
+        if (username) this.view.setUsername(username);
+        this.view.setUsernameWidth();
     }
 
-    function updateUsername(event) {
+    setEventListeners() {
+        window.addEventListener('resize', () => this.view.setAppHeight());
+        this.view.usernameInput.addEventListener('input', () => this.view.setUsernameWidth());
+        this.view.homeBtns.forEach((homeBtn) => {
+            homeBtn.addEventListener('click', () => this.view.returnToHomeScreen());
+        });
+        this.view.modeSelectBtns.forEach((modeSelectBtn) => {
+            modeSelectBtn.addEventListener('click', (event) => this.selectMode(event));
+        });
+        this.view.usernameForm.addEventListener('submit', (event) => this.updateUsername(event));
+        this.view.touchTargets.forEach((touchTarget) => {
+            const cell = touchTarget.parentElement;
+            touchTarget.addEventListener('mousedown', () => this.selectCell(cell, true));
+            touchTarget.addEventListener('mousemove', () => this.selectCell(cell));
+            touchTarget.addEventListener('touchstart', () => this.selectCell(cell, true));
+            touchTarget.addEventListener('touchmove', (event) => this.selectTouchedCell(event));
+        });
+        window.addEventListener('touchcancel', () => this.endWordSelection());
+        window.addEventListener('touchend', () => this.endWordSelection());
+        window.addEventListener('mouseup', () => this.endWordSelection());
+    }
+
+    updateUsername(event) {
         event.preventDefault();
         document.activeElement.blur();
         const formData = new FormData(event.target);
         const username = formData.get('username');
-        localStorage.setItem('username', username);
+        this.model.setUsername(username);
     }
 
-    async function selectGameMode(event) {
-        const gameMode = event.currentTarget.dataset.gameMode;
-        switch (gameMode) {
+    async selectMode(event) {
+        this.model.resetGameState();
+        this.initializeGameData();
+        this.view.setCurrentScore(0);
+        this.view.updateWordCount(0);
+        const mode = event.currentTarget.dataset.mode;
+        switch (mode) {
             case 'Timed':
-                Model.resetGameState();
-                initializeGameData();
-                View.selectTimed();
-                startTimer();
+                this.view.selectTimedMode();
+                this.startTimer();
                 break
             case 'Free Play':
-                initializeGameData();
-                View.selectFreePlay();
+                this.view.selectFreePlayMode();
                 break
             case 'VS Friend':
                 break
@@ -58,47 +74,91 @@ export const Controller = (() => {
         }
     }
 
-    async function initializeGameData() {
-        const gameData = await API.getGameData();
-        Model.updateValidWords(gameData.words);
-        View.populateGameboard(gameData.board);
-
+    async initializeGameData() {
+        const gameboard = await this.model.getGameboard();
+        for (let i = 0; i < 16; i++) {
+            const row = Math.floor(i / 4);
+            const col = i % 4;
+            const text = gameboard[row][col]
+            this.view.setLetterText(i, text);
+        }
     }
 
-    function startTimer() {
-        Model.decrementSecondsRemaining();
-        const gameState = Model.getGameState();
-        View.updateTimer(gameState.secondsRemaining);
-        if (gameState.secondsRemaining > 0) setTimeout(startTimer, 1000);
-        else View.displayResults(
-            gameState.score,
-            gameState.longestWord,
-            gameState.wordLengthDistribution,
-            gameState.wordCount
-        );
+    startTimer() {
+        this.model.decrementSecondsRemaining();
+        const gameState = this.model.getGameState();
+        const timeString = secondsToMSS(gameState.secondsRemaining);
+        this.view.updateCountdownTimer(timeString);
+        if (gameState.secondsRemaining > 0) setTimeout(() => this.startTimer(), 1000);
+        else {
+            this.view.displayResults(gameState.score, gameState.longestWord);
+            this.animateBarGraph();
+        }
     }
 
-    function selectTouchedCell(event) {
-        const cell = View.getCellFromTouch(event.touches[0]);
-        if (cell?.className === 'cell-touch-area') selectCell(cell.parentNode);
+    animateBarGraph(frame = 0) {
+        const gameState = this.model.getGameState();
+        const frames = 120;
+        if (frame > frames) return;
+        const progress = easeOutExponential(frame / frames);
+        for (let i = 0; i < 13; i++) {
+            const wordLengthCount = gameState.wordLengthDistribution[i + 3];
+            const width = `${100 * progress * wordLengthCount / gameState.wordCount}%`;
+            const count = Math.round(progress * wordLengthCount);
+            this.view.updateChartBar(i, width, count);
+        }
+        requestAnimationFrame(() => this.animateBarGraph(frame + 1));
     }
 
-    function selectCell(cell, startSelecting = false) {
-        const gameState = Model.getGameState();
-        if (startSelecting) Model.setIsSelecting(true);
-        if (!gameState.isSelecting || !isValidCellSelection(cell)) return;
-        View.animateCellSelection(cell.querySelector('.cell-letter'));
-        View.drawCircle(cell);
+    selectTouchedCell(event) {
+        const [x, y] = [event.touches[0].clientX, event.touches[0].clientY];
+        const cell = document.elementFromPoint(x, y);
+        if (cell?.className === 'cell-touch-area') this.selectCell(cell.parentNode);
+    }
+
+    selectCell(cell, startSelecting = false) {
+        const gameState = this.model.getGameState();
+        if (startSelecting) this.model.setIsSelecting(true);
+        if (!gameState.isSelecting || !this.isValidCellSelection(cell)) return;
+        this.animateCellSelection(cell.firstElementChild);
+        this.drawCircle(cell);
         const lastCell = gameState.selectedCells.at(-1);
-        if (gameState.lastSelectedRow > -1) View.drawLine(lastCell, cell);
-        Model.addSelectedCell(cell);
-        Model.addToCurrentWordString(cell.querySelector('.cell-letter').textContent);
-        updateWordAndCellColors(cell);
-        Model.updateLastSelectedPosition(cell);
+        if (gameState.lastSelectedRow > -1) this.drawLine(lastCell, cell);
+        this.model.addSelectedCell(cell);
+        this.model.addToSelectedLettersString(cell.firstElementChild.textContent);
+        this.updateWordAndCellColors(cell);
+        this.model.updateLastSelectedPosition(cell);
     }
 
-    function isValidCellSelection(cell) {
-        const gameState = Model.getGameState();
+    drawCircle(cell) {
+        const cx = cell.offsetLeft + cell.clientWidth / 2
+        const cy = cell.offsetTop + cell.clientHeight / 2
+        const r = cell.clientWidth / 14.5;
+        this.view.drawCircle(cx, cy, r);
+    }
+
+    drawLine(startCell, endCell) {
+        const strokeWidth = startCell.clientWidth / 6.5;
+        const x1 = startCell.offsetLeft + startCell.clientWidth / 2;
+        const y1 = startCell.offsetTop + startCell.clientHeight / 2;
+        const x2 = endCell.offsetLeft + endCell.clientWidth / 2;
+        const y2 = endCell.offsetTop + endCell.clientHeight / 2;
+        this.view.drawLine(strokeWidth, x1, y1, x2, y2);
+    }
+
+    animateCellSelection(cell, frame = 0) {
+        const frames = 12;
+        if (frame > frames) {
+            this.view.setCellStyle(cell, '', '', '');
+        } else {
+            const progress = frame / frames;
+            this.view.setCellStyle(cell, `${93 + 7 * progress}%`, `${40 - 15 * progress}%`, `calc(${11.5 + 2 * progress} * var(--base-unit))`);
+            requestAnimationFrame(() => this.animateCellSelection(cell, frame + 1));
+        }
+    }
+
+    isValidCellSelection(cell) {
+        const gameState = this.model.getGameState();
         if (cell.style.color !== '') return false;
         if (gameState.lastSelectedRow === -1) return true;
         const rowDiff = Math.abs(cell.style.gridRowStart - gameState.lastSelectedRow);
@@ -106,50 +166,91 @@ export const Controller = (() => {
         return rowDiff <= 1 && colDiff <= 1;
     }
 
-    function updateWordAndCellColors(cell) {
-        const gameState = Model.getGameState();
-        const word = gameState.currentWordString;
+    updateWordAndCellColors(cell) {
+        const gameState = this.model.getGameState();
+        const word = gameState.selectedLetters;
         const words = gameState.validWords[word.length];
         const isValidWord = words && words.has(word);
         if (!isValidWord) {
-            View.setGameSvgColor('');
-            View.setCellsColor(gameState.selectedCells, cell, Model.COLORS.SELECTED);
-            View.updateWordDisplay(gameState.currentWordString, '', 0);
+            this.view.setLetterPathColor('');
+            this.setCellsColor(gameState.selectedCells, cell, this.model.COLORS.SELECTED);
+            this.updateWordDisplay(gameState.selectedLetters, '', 0);
             return;
         }
-        View.setGameSvgColor('white');
+        this.view.setLetterPathColor('white');
         if (gameState.foundWords[word.length].has(word)) {
-            View.setCellsColor(gameState.selectedCells, cell, Model.COLORS.DUPLICATE);
-            View.updateWordDisplay(gameState.currentWordString, Model.COLORS.DUPLICATE, 0);
+            this.setCellsColor(gameState.selectedCells, cell, this.model.COLORS.DUPLICATE);
+            this.updateWordDisplay(gameState.selectedLetters, this.model.COLORS.DUPLICATE, 0);
         } else {
-            View.setCellsColor(gameState.selectedCells, cell, Model.COLORS.VALID);
-            View.updateWordDisplay(gameState.currentWordString, Model.COLORS.VALID, Model.POINTS[gameState.selectedCells.length]);
+            this.setCellsColor(gameState.selectedCells, cell, this.model.COLORS.VALID);
+            this.updateWordDisplay(gameState.selectedLetters, this.model.COLORS.VALID, this.model.POINTS[gameState.selectedCells.length]);
         }
     }
 
-    function endWordSelection() {
-        const gameState = Model.getGameState();
+    setCellsColor(selectedCells, cell, color) {
+        if (selectedCells[0]?.style.color === color) selectedCells = [cell];
+        selectedCells.forEach((cell) => this.view.setCellColor(cell, color));
+    }
+
+    endWordSelection() {
+        const gameState = this.model.getGameState();
         if (!gameState.isSelecting) return;
         const firstCell = gameState.selectedCells[0];
-        const isValidWord = firstCell?.style.color === Model.COLORS.VALID;
+        const isValidWord = firstCell?.style.color === this.model.COLORS.VALID;
         if (isValidWord) {
-            Model.incrementWordCount();
-            Model.addFoundWord();
-            if (gameState.currentWordString.length > gameState.longestWord.length) {
-                Model.updateLongestWord();
+            this.model.incrementWordCount();
+            this.model.addFoundWord();
+            if (gameState.selectedLetters.length > gameState.longestWord.length) {
+                this.model.updateLongestWord();
             }
-            View.updateWordCount(gameState.wordCount);
-            const points = Model.POINTS[gameState.selectedCells.length];
-            View.animateScoreIncrease(gameState.score, points);
-            Model.increaseScore(points);
+            this.view.updateWordCount(gameState.wordCount);
+            const points = this.model.POINTS[gameState.selectedCells.length];
+            this.animateScoreIncrease(gameState.score, points);
+            this.model.increaseScore(points);
         }
-        View.resetGameSvg();
-        View.resetCellsStyle(gameState.selectedCells);
-        View.animateWordFadeOut();
-        Model.resetCellSelection();
+        this.view.resetLetterPath();
+        gameState.selectedCells.forEach((cell) => this.view.setCellColor(cell, ''));
+        this.animateWordFadeOut();
+        this.model.resetCellSelection();
     }
 
-    return {
-        init
-    };
-})();
+
+
+    animateScoreIncrease(score, points, frame = 0) {
+        const frames = 28;
+        if (frame > frames) {
+            this.view.setCurrentScore(score + points);
+        } else {
+            const progress = smoothStep(frame / frames);
+            this.view.setCurrentScore(score + Math.round(points * progress));
+            requestAnimationFrame(() => this.animateScoreIncrease(score, points, frame + 1));
+        }
+    }
+
+    animateWordFadeOut(frame = 0) {
+        const frames = 12;
+        if (frame > frames) {
+            this.view.resetSelectedLetters();
+        } else {
+            const progress = smoothStep(frame / frames);
+            this.view.setSelectedLettersOpacity(1 - progress);
+            requestAnimationFrame(() => this.animateWordFadeOut(frame + 1));
+        }
+    }
+
+    updateWordDisplay(selectedLetters, color, value) {
+        if (color === '') {
+            this.view.setSelectedLettersStyle('', '', '');
+        } else {
+            this.view.setSelectedLettersStyle(color, 'black', 500);
+        }
+        if (value <= 0) {
+            this.view.setSelectedLettersText(selectedLetters);
+        } else {
+            this.view.setSelectedLettersText(`${selectedLetters} (+${value})`);
+        }
+    }
+
+    /*................................RESULTS SCREEN................................*/
+
+}

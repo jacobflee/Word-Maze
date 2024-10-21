@@ -1,4 +1,4 @@
-/* GLOBAL */
+/*................................GLOBAL................................*/
 
 @media only screen and (orientation: portrait) {
     :root {
@@ -17,15 +17,11 @@
 }
 
 body {
-    background: linear-gradient(to bottom, #0d212f 0, black calc(16 * var(--base-unit)));
-    color: white;
+    background: linear-gradient(to bottom, #0d212f 0, black calc(22 * var(--base-unit)));
     margin: 0;
-    font-family: "Cousine", monospace;
     display: flex;
     justify-content: center;
     height: var(--app-height);
-    font-size: calc(4 * var(--base-unit));
-
     -webkit-touch-callout: none;
     -webkit-user-select: none;
     -khtml-user-select: none;
@@ -34,85 +30,70 @@ body {
     user-select: none;
 }
 
+body,
+button,
+input {
+    font-family: 'Cousine', monospace;
+    color: #fff;
+    font-size: calc(4 * var(--base-unit));
+}
+
+button,
+input {
+    background-color: transparent;
+    border: 0;
+}
+
 .screen {
     width: var(--app-width);
+    display: flex;
+    flex-direction: column;
+    gap: calc(4 * var(--base-unit));
 }
 
 header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
-    padding: calc(4 * var(--base-unit)) 0;
-    height: calc(16 * var(--base-unit));
-    box-sizing: border-box;
-}
-
-button,
-input {
-    font-family: "Cousine", monospace;
-    color: white;
-    font-size: calc(4 * var(--base-unit));
-}
-
-.back-button {
-    background-color: black;
-    border: calc(0.5 * var(--base-unit)) solid #0d212f;
-    /* border: 0; */
-    padding: var(--base-unit) calc(4 * var(--base-unit));
-    border-radius: calc(2 * var(--base-unit));
-    display: flex;
+    height: calc(20 * var(--base-unit));
+    font-size: calc(6 * var(--base-unit));
     z-index: 1;
 }
 
-/* MENU */
 
-#main-menu-screen {
-    z-index: 1;
-    display: flex;
-    flex-direction: column;
+/*................................HOME SCREEN................................*/
+
+#home-screen {
     gap: calc(8 * var(--base-unit));
 }
 
-#game-title {
-    font-size: calc(6 * var(--base-unit));
-    font-weight: 700;
-}
-
-#username-form {
-    display: flex;
-}
-
-#username-form input {
-    background-color: transparent;
-    border: 0;
+#username {
     text-align: center;
-    outline: none;
+    outline: 0;
 }
 
-.game-mode-button {
-    height: calc(12 * var(--base-unit));
+.mode-select-btn {
+    height: calc(16 * var(--base-unit));
     border: 0;
-    background: linear-gradient(to right, black, #0d212f);
+    background: linear-gradient(to right, #000, #0d212f);
     border-radius: calc(4 * var(--base-unit));
-    display: flex;
-    align-items: center;
-    justify-content: center;
     position: relative;
 }
 
-.game-mode-icon {
+.mode-icon {
     position: absolute;
     left: 0;
-    width: calc(12 * var(--base-unit));
+    width: calc(16 * var(--base-unit));
 }
 
-/* GAME */
 
-#game-svg {
+/*................................GAME SCREEN................................*/
+
+#letter-path {
     position: absolute;
     top: 0;
-    opacity: 0.4;
+    left: 0;
+    opacity: .4;
     fill: red;
     stroke: red;
     z-index: 1;
@@ -120,26 +101,24 @@ input {
     height: var(--app-height);
 }
 
-#game-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: calc(2 * var(--base-unit));
-}
-
-#game-timer,
-#word-counter,
-#current-word {
+#selected-letters,
+#countdown-timer,
+#word-counter {
     font-size: calc(6 * var(--base-unit));
 }
 
-#game-score {
-    font-size: calc(7.5 * var(--base-unit));
-    font-weight: 700;
-    color: yellow;
+#selected-letters,
+#current-score {
+    align-self: center;
 }
 
-#current-word {
+#current-score {
+    font-size: calc(7.5 * var(--base-unit));
+    font-weight: 700;
+    color: #ff0;
+}
+
+#selected-letters {
     padding: var(--base-unit) calc(2 * var(--base-unit));
     border-radius: calc(2 * var(--base-unit));
 }
@@ -151,29 +130,30 @@ input {
     display: grid;
     grid-template-rows: repeat(4, 1fr);
     grid-template-columns: repeat(4, 1fr);
+    gap: var(--base-unit);
 }
 
-.board-cell {
-    position: relative;
-    margin: calc(0.5 * var(--base-unit));
+.cell,
+.letter {
     display: flex;
-    justify-content: center;
     align-items: center;
+    justify-content: center;
 }
 
-.cell-letter {
+.cell {
+    position: relative;
+}
+
+.letter {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    border: calc(0.65 * var(--base-unit)) solid white;
+    border: calc(.65 * var(--base-unit)) solid white;
     border-radius: calc(5 * var(--base-unit));
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: calc(13.5 * var(--base-unit));
 }
 
-.cell-touch-area {
+.touch-target {
     position: absolute;
     z-index: 1;
     width: 90%;
@@ -181,45 +161,48 @@ input {
     border-radius: 45%;
 }
 
-/* RESULTS */
 
-#results-screen {
-    display: flex;
-    flex-direction: column;
-    gap: calc(4 * var(--base-unit));
-}
+/*................................RESULTS SCREEN................................*/
 
-#results-summary {
+#game-recap {
     display: grid;
     grid-template-rows: repeat(2, 1fr);
     grid-template-columns: repeat(2, 1fr);
     gap: calc(2 * var(--base-unit));
 }
 
+#game-recap>* {
+    display: flex;
+    align-items: center;
+}
+
 #final-score,
 #longest-word {
-    text-align: center;
+    justify-self: center;
     font-weight: 700;
+    font-size: calc(5 * var(--base-unit));
 }
 
 #final-score {
-    color: #FFFF00;
+    color: #ff0;
 }
 
-#results-chart {
+#word-length-chart,
+.chart-bar {
     display: flex;
+    gap: calc(2 * var(--base-unit));
+}
+
+#word-length-chart {
     flex-direction: column;
-    gap: calc(2 * var(--base-unit));
 }
 
-.bar {
-    display: flex;
+.chart-bar {
     align-items: center;
-    gap: calc(2 * var(--base-unit));
 }
 
 .bar-fill {
     height: calc(4 * var(--base-unit));
-    background-color: #3399DD;
-    border-left: 1px solid #3399DD;
+    background-color: #39d;
+    border-left: 1px solid #39d;
 }

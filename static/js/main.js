@@ -3,6 +3,6 @@ import { View } from './modules/View.js'
 import { Controller } from './modules/Controller.js'
 
 
-Model.init();
-View.init();
-Controller.init();
+const model = new Model();
+const view = new View();
+new Controller(model, view);
