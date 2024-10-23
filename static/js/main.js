@@ -1,8 +1,8 @@
-import { Model } from './modules/Model.js'
-import { View } from './modules/View.js'
-import { Controller } from './modules/Controller.js'
+import { Model } from './modules/model/Model.js'
+import { View } from './modules/view/View.js'
+import { Presenter } from './modules/presenter/Presenter.js'
 
 
 const model = new Model();
 const view = new View();
-new Controller(model, view);
+new Presenter(model, view);

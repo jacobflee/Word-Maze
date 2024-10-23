@@ -20,20 +20,20 @@ def index():
     return render_template("index.html")
 
 
-@app.route("/get_game_data", methods=["GET"])
+@app.route("/api/get_game_data", methods=["GET"])
 def get_gameboard():
-    directory = 'static/jsons'
+    directory = 'static/assets/jsons'
     filename = random.choice(os.listdir(directory))
     gameData = json.load(open(os.path.join(directory, filename)))
     return gameData
 
 
-# @app.route("/get_online_users", methods=["GET"])
+# @app.route("/api/get_online_users", methods=["GET"])
 # def get_online_users():
 #     return jsonify(list(online_users))
 
 
-# @app.route("/user_online", methods=["POST"])
+# @app.route("/api/user_online", methods=["POST"])
 # def user_online():
 #     username = request.json.get("username")
 #     if not username:
@@ -42,7 +42,7 @@ def get_gameboard():
 #     return jsonify({"status": "success", "message": f"{username} is now online"})
 
 
-# @app.route("/user_offline", methods=["POST"])
+# @app.route("/api/user_offline", methods=["POST"])
 # def user_offline():
 #     username = request.json.get("username")
 #     if not username:
@@ -51,7 +51,7 @@ def get_gameboard():
 #     return jsonify({"status": "success", "message": f"{username} is now offline"})
 
 
-# @app.route("/initiate_match", methods=["POST"])
+# @app.route("/api/initiate_match", methods=["POST"])
 # def initiate_match():
 #     username1 = request.json.get("username1")
 #     username2 = request.json.get("username2")

@@ -1,0 +1,42 @@
+#game-recap {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: calc(2 * var(--base-unit));
+}
+
+#game-recap>* {
+    display: flex;
+    align-items: center;
+}
+
+#final-score,
+#longest-word {
+    justify-self: center;
+    font-weight: 700;
+    font-size: calc(5 * var(--base-unit));
+}
+
+#final-score {
+    color: #ff0;
+}
+
+#word-length-chart,
+.chart-bar {
+    display: flex;
+    gap: calc(2 * var(--base-unit));
+}
+
+#word-length-chart {
+    flex-direction: column;
+}
+
+.chart-bar {
+    align-items: center;
+}
+
+.bar-fill {
+    height: calc(4 * var(--base-unit));
+    background-color: #39d;
+    border-left: 1px solid #39d;
+}

@@ -1,15 +1,43 @@
+import { COLORS, LAYOUT } from '../config.js';
+
+
 export class View {
-    /*................................GLOBAL................................*/
-    
     constructor() {
+        this.setAppHeight();
+        // this.applyBaseStyles();
+        this.setDomElements();
+    }
+
+
+    /*................................GLOBAL................................*/
+
+    setAppHeight() {
+        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    }
+
+    // applyBaseStyles() {
+    //     const root = document.documentElement;
+    //     root.style.setProperty('--base-unit', 
+    //         window.matchMedia('(orientation: portrait)').matches ? 
+    //         LAYOUT.BASE_UNIT.PORTRAIT : 
+    //         LAYOUT.BASE_UNIT.LANDSCAPE
+    //     );
+    //     document.body.style.background = COLORS.BACKGROUND.GRADIENT;
+    // }
+
+    setDomElements() {
         this.screens = document.querySelectorAll('.screen');
         this.homeBtns = document.querySelectorAll('.home-btn');
+
         this.homeScreen = document.getElementById('home-screen');
         this.usernameForm = document.getElementById('username-form');
         this.usernameInput = document.getElementById('username');
         this.modeSelectBtns = document.querySelectorAll('.mode-select-btn');
+
         this.gameScreen = document.getElementById('game-screen');
         this.letterPath = document.getElementById('letter-path');
+        this.navControls = document.getElementById('nav-controls');
+        this.resultsBtn = document.getElementById('results-btn');
         this.countdownTimer = document.getElementById('countdown-timer');
         this.wordCounter = document.getElementById('word-counter');
         this.currentScore = document.getElementById('current-score');
@@ -17,6 +45,7 @@ export class View {
         this.gameBoard = document.getElementById('game-board');
         this.letters = document.querySelectorAll('.letter');
         this.touchTargets = document.querySelectorAll('.touch-target');
+
         this.resultsScreen = document.getElementById('results-screen');
         this.finalScore = document.getElementById('final-score');
         this.longestWord = document.getElementById('longest-word');
@@ -24,21 +53,17 @@ export class View {
         this.barCounts = document.querySelectorAll('.bar-count');
     }
 
-    setAppHeight() {
-        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
-    }
-
     changeScreen(screen) {
         this.screens.forEach((screen) => screen.style.display = 'none');
         screen.style.display = '';
     }
 
-    setHomeBtnsDisplay(display) {
-        this.homeBtns.forEach((homeBtn) => homeBtn.style.display = display);
+    blurActiveElement() {
+        document.activeElement.blur();
     }
 
 
-    /*................................HOME SCREEN................................*/
+    /*................................HOME................................*/
     
     setUsername(username) {
         this.usernameInput.value = username;
@@ -54,13 +79,13 @@ export class View {
     }
 
     selectTimedMode() {
-        this.setHomeBtnsDisplay('none');
+        this.navControls.style.display = 'none';
         this.countdownTimer.style.display = '';
         this.changeScreen(this.gameScreen);
     }
-
+    
     selectFreePlayMode() {
-        this.setHomeBtnsDisplay('');
+        this.navControls.style.display = '';
         this.countdownTimer.style.display = 'none';
         this.changeScreen(this.gameScreen);
     }
@@ -74,10 +99,11 @@ export class View {
     }
 
 
-    /*................................GAME SCREEN................................*/
+    /*................................GAME................................*/
 
-    updateCountdownTimer(timeString) {
+    updateCountdownTimer(timeString, color) {
         this.countdownTimer.textContent = timeString;
+        this.countdownTimer.style.color = color;
     }
 
     setCellStyle(cell, side, radius, fontSize) {
@@ -105,15 +131,6 @@ export class View {
         this.letterPath.appendChild(line);
     }
 
-    resetLetterPath() {
-        this.letterPath.innerHTML = '';
-    }
-
-    setLetterPathColor(value) {
-        this.letterPath.style.fill = value;
-        this.letterPath.style.stroke = value;
-    }
-
     updateWordCount(wordCount) {
         this.wordCounter.textContent = `Words: ${wordCount}`;
     }
@@ -131,30 +148,33 @@ export class View {
         this.selectedLetters.style.opacity = opacity;
     }
 
-    setSelectedLettersStyle(backgroundColor, color, fontWeight) {
+    setLetterText(i, text) {
+        this.letters[i].textContent = text;
+    }
+
+    resetLetterPathAndSelectedCells(selectedCells) {
+        this.letterPath.innerHTML = '';
+        selectedCells.forEach((cell) => this.setCellColor(cell, ''));
+    }
+
+    updateSelectedLetters(text, backgroundColor, color, fontWeight, value, cellsToColor, currentCellColor) {
+        this.selectedLetters.textContent = text;
         this.selectedLetters.style.backgroundColor = backgroundColor;
         this.selectedLetters.style.color = color;
         this.selectedLetters.style.fontWeight = fontWeight;
-    }
-
-    setSelectedLettersText(text) {
-        this.selectedLetters.textContent = text;
-    }
-
-    setLetterText(i, text) {
-        this.letters[i].textContent = text;
+        this.letterPath.style.fill = value;
+        this.letterPath.style.stroke = value;
+        cellsToColor.forEach((cell) => this.setCellColor(cell, currentCellColor));
     }
 
     setCellColor(cell, color) {
         cell.firstElementChild.style.borderColor = color;
         cell.style.color = color;
     }
-
     
-    /*................................RESULTS SCREEN................................*/
+    /*................................RESULTS................................*/
 
     displayResults(currentScore, longestWord) {
-        this.setHomeBtnsDisplay('');
         this.finalScore.textContent = currentScore;
         this.longestWord.textContent = longestWord;
         this.changeScreen(this.resultsScreen);
