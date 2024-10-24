@@ -1,0 +1,244 @@
+/*................GLOBAL................*/
+
+@media only screen and (orientation: portrait) {
+    :root {
+        --base-unit: 1vw;
+    }
+}
+
+@media only screen and (orientation: landscape) {
+    :root {
+        --base-unit: 0.4vw;
+    }
+}
+
+:root {
+    --app-width: calc(84 * var(--base-unit));
+}
+
+body {
+    background: linear-gradient(to bottom, var(--primary-background-color) 0, var(--secondary-background-color) calc(22 * var(--base-unit)));
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    height: var(--app-height);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+body,
+button,
+input {
+    font-family: 'Cousine', monospace;
+    color: var(--primary-text-color);
+    font-size: calc(4 * var(--base-unit));
+}
+
+button,
+input {
+    background-color: transparent;
+    border: 0;
+    padding: 0;
+}
+
+.screen {
+    width: var(--app-width);
+    display: flex;
+    flex-direction: column;
+    gap: calc(4 * var(--base-unit));
+}
+
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: calc(20 * var(--base-unit));
+    z-index: 1;
+}
+
+header i {
+    width: calc(6 * var(--base-unit));
+}
+
+.icon-home {
+    content: url('../assets/icons/home.svg');
+}
+
+
+/*................HOME................*/
+
+#home-screen {
+    gap: calc(8 * var(--base-unit));
+}
+
+#username {
+    text-align: center;
+    outline: 0;
+}
+
+.mode-select-btn {
+    height: calc(16 * var(--base-unit));
+    border: 0;
+    background: linear-gradient(to right, var(--secondary-background-color), var(--primary-background-color));
+    border-radius: calc(4 * var(--base-unit));
+    position: relative;
+    font-size: calc(4.5 * var(--base-unit));
+}
+
+.mode-select-btn i {
+    position: absolute;
+    left: 0;
+    top: calc(5 * var(--base-unit));;
+    width: calc(12 * var(--base-unit));
+    height: calc(6 * var(--base-unit));
+}
+
+.icon-clock {
+    content: url('../assets/icons/clock.svg');
+}
+
+.icon-circle {
+    content: url('../assets/icons/circle.svg');
+}
+
+.icon-friends {
+    content: url('../assets/icons/friends.svg');
+}
+
+.icon-random {
+    content: url('../assets/icons/random.svg');
+}
+
+
+/*................GAME................*/
+
+#letter-path {
+    position: absolute;
+    top: 0;
+    left: 0;
+    opacity: .4;
+    fill: var(--letter-path-selected);
+    stroke: var(--letter-path-selected);
+    z-index: 1;
+    width: 100vw;
+    height: var(--app-height);
+}
+
+#selected-letters,
+#countdown-timer,
+#word-counter {
+    font-size: calc(6 * var(--base-unit));
+}
+
+#selected-letters,
+#current-score {
+    align-self: center;
+}
+
+#current-score {
+    font-size: calc(7.5 * var(--base-unit));
+    font-weight: 700;
+    color: var(--score-color);
+}
+
+#selected-letters {
+    padding: var(--base-unit) calc(2 * var(--base-unit));
+    border-radius: calc(2 * var(--base-unit));
+}
+
+#game-board {
+    width: var(--app-width);
+    height: var(--app-width);
+    touch-action: none;
+    display: grid;
+    grid-template-rows: repeat(4, 1fr);
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--base-unit);
+}
+
+.cell,
+.letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell {
+    position: relative;
+}
+
+.letter {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    border: calc(.65 * var(--base-unit)) solid var(--primary-text-color);
+    border-radius: calc(5 * var(--base-unit));
+    font-size: calc(13.5 * var(--base-unit));
+}
+
+.touch-target {
+    position: absolute;
+    z-index: 1;
+    width: 90%;
+    height: 90%;
+    border-radius: 45%;
+}
+
+#nav-controls {
+    display: flex;
+    gap: calc(6 * var(--base-unit));
+}
+
+.icon-results {
+    content: url('../assets/icons/results.svg');
+}
+
+
+/*................RESULTS................*/
+
+#game-recap {
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(2, 1fr);
+    gap: calc(2 * var(--base-unit));
+}
+
+#game-recap>* {
+    display: flex;
+    align-items: center;
+}
+
+#final-score,
+#longest-word {
+    justify-self: center;
+    font-weight: 700;
+    font-size: calc(5 * var(--base-unit));
+}
+
+#final-score {
+    color: var(--score-color);
+}
+
+#word-length-chart,
+.chart-bar {
+    display: flex;
+    gap: calc(2 * var(--base-unit));
+}
+
+#word-length-chart {
+    flex-direction: column;
+}
+
+.chart-bar {
+    align-items: center;
+}
+
+.bar-fill {
+    height: calc(4 * var(--base-unit));
+    background-color: var(--chart-bar-color);
+    border-left: 1px solid var(--chart-bar-color);
+}

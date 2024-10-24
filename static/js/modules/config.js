@@ -2,17 +2,17 @@ export const COLORS = {
     DUPLICATE: 'rgb(220, 220, 40)',
     VALID: 'rgb(20, 180, 40)',
     SELECTED: 'rgb(40, 80, 240)',
-    TIMER_WARNING: '#F00',
     SCORE: '#FF0',
     CHART_BAR: '#39D',
-
+    LETTER_PATH_SELECTED: '#F00',
+    LETTER_PATH_VALID: '#FFF',
+    WORD_VALID: '#000',
     BACKGROUND: {
-        PRIMARY: '#0D212F',
-        SECONDARY: '#000',
+        PRIMARY: '#0D202D',
+        SECONDARY: '#040008',
     },
     TEXT: {
         PRIMARY: '#FFF',
-        SECONDARY: '#CCC',
     },
 };
 
@@ -33,29 +33,11 @@ export const POINTS = {
 };
 
 export const TIMING = {
-    GAME_DURATION: 13,
-    WARNING_THRESHOLD: 10,
+    GAME_DURATION: 91,
     ANIMATION: {
         CELL_SELECTION: 12,
         WORD_FADE: 12,
         SCORE_INCREMENT: 28,
         BAR_GRAPH: 120,
-    },
-};
-
-export const LAYOUT = {
-    BASE_UNIT: {
-        PORTRAIT: '1vw',
-        LANDSCAPE: '0.4vw',
-    },
-    APP_WIDTH: 84,
-    CELL: {
-        BORDER_WIDTH: 0.65,
-        BORDER_RADIUS: 5,
-        FONT_SIZE: 13.5,
-        TOUCH_TARGET: {
-            SIZE: '90%',
-            RADIUS: '45%',
-        },
     },
 };

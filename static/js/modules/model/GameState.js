@@ -1,4 +1,5 @@
-import { COLORS, POINTS, TIMING } from '../config.js';
+import { POINTS, TIMING } from '../config.js';
+import { secondsToMSS } from '../utils.js'
 
 
 export class GameState {
@@ -16,6 +17,7 @@ export class GameState {
         this.longestWord = '';
         this.countdownTimerColor = '';
         this.timerId = null;
+        this.timeString = '';
     }
 
     startTimer(callback) {
@@ -25,15 +27,13 @@ export class GameState {
 
     timer(callback) {
         this.secondsRemaining--;
-        this.countdownTimerColor = this.secondsRemaining < TIMING.WARNING_THRESHOLD ? COLORS.TIMER_WARNING : '';
+        this.timeString = secondsToMSS(this.secondsRemaining);
+        this.countdownTimerColor = this.secondsRemaining < 10 ? '#F00' : '';
         callback();
-        if (this.secondsRemaining <= 0)
-            this.stopTimer();
-    }
-
-    stopTimer() {
-        clearInterval(this.timerId);
-        this.timerId = null;
+        if (this.secondsRemaining <= 0) {
+            clearInterval(this.timerId);
+            this.timerId = null;
+        }
     }
 
     updateValidWords(words) {

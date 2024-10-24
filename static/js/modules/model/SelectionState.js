@@ -63,11 +63,11 @@ export class SelectionState {
         if (this.isValidWord) {
             const color = this.isFoundWord ? COLORS.DUPLICATE : COLORS.VALID;
             this.currentCellColor = color;
-            this.currentPathColor = 'white';
+            this.currentPathColor = COLORS.LETTER_PATH_VALID;
             this.currentWordPoints = POINTS[this.selectedLetters.length];
             this.wordDisplayBackgroundColor = color;
             this.wordDisplay = `${this.selectedLetters} (+${this.currentWordPoints})`;
-            this.wordDisplayColor = 'black';
+            this.wordDisplayColor = COLORS.WORD_VALID;
             this.wordDisplayFontWeight = 500;
         } else {
             this.currentCellColor = COLORS.SELECTED;

@@ -9,10 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cousine:wght@400;700&display=swap">
 
-    <link rel="stylesheet" type="text/css" href="./static/css/global.css">
-    <link rel="stylesheet" type="text/css" href="./static/css/home.css">
-    <link rel="stylesheet" type="text/css" href="./static/css/game.css">
-    <link rel="stylesheet" type="text/css" href="./static/css/results.css">
+    <link rel="stylesheet" type="text/css" href="./static/css/styles.css">
 
     <link rel="icon" type="image/svg+xml" href="./static/assets/icons/favicon.svg">
     <link rel="icon" type="image/x-icon" href="./static/assets/icons/favicon.ico">
@@ -20,60 +17,51 @@
     <link rel="apple-touch-icon" type="image/svg+xml" href="./static/assets/logos/logo.svg" />
     <link rel="apple-touch-icon" type="image/png" href="./static/assets/logos/logo.png" />
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/js/all.min.js" defer></script>
     <script type="module" src="./static/js/main.js"></script>
 
     <title>Word Maze</title>
 </head>
 
 <body>
-    <!--................................HOME................................-->
+    <!--................HOME................-->
 
     <div id="home-screen" class="screen">
         <header>
-            <h4>Word Maze</h4>
+            <h2>Word Maze</h2>
             <form id="username-form">
                 <input type="text" id="username" name="username" placeholder="create username" autocomplete="off">
             </form>
         </header>
         <button class="mode-select-btn" data-mode="Timed">
-            <span class="mode-icon">
-                <i class="far fa-clock"></i>
-            </span>
+            <i class="icon-clock"></i>
             <span>Timed</span>
         </button>
         <button class="mode-select-btn" data-mode="Free Play">
-            <span class="mode-icon">
-                <i class="far fa-circle"></i>
-            </span>
+            <i class="icon-circle"></i>
             <span>Free Play</span>
         </button>
         <button class="mode-select-btn" data-mode="VS Friend">
-            <span class="mode-icon">
-                <i class="fas fa-user-friends"></i>
-            </span>
+            <i class="icon-friends"></i>
             <span>VS Friend</span>
         </button>
         <button class="mode-select-btn" data-mode="VS Random">
-            <span class="mode-icon">
-                <i class="fas fa-question"></i>
-            </span>
+            <i class="icon-random"></i>
             <span>VS Random</span>
         </button>
     </div>
 
 
-    <!--................................GAME................................-->
+    <!--................GAME................-->
 
     <div id="game-screen" class="screen">
         <svg id="letter-path"></svg>
         <header>
             <div id="nav-controls">
                 <button class="home-btn">
-                    <i class="fa-solid fa-house"></i>
+                    <i class="icon-home"></i>
                 </button>
                 <button id="results-btn">
-                    <i class="fa-solid fa-square-poll-horizontal"></i>
+                    <i class="icon-results"></i>
                 </button>
             </div>
             <div id="countdown-timer"></div>
@@ -150,12 +138,12 @@
     </div>
 
 
-    <!--................................RESULTS................................-->
+    <!--................RESULTS................-->
 
     <div id="results-screen" class="screen">
         <header>
             <button class="home-btn">
-                <i class="fa-solid fa-house"></i>
+                <i class="icon-home"></i>
             </button>
         </header>
         <div id="game-recap">

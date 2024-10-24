@@ -1,11 +1,12 @@
-import { COLORS, LAYOUT } from '../config.js';
+import { COLORS } from '../config.js';
 
 
 export class View {
     constructor() {
         this.setAppHeight();
-        // this.applyBaseStyles();
+        this.applyColorConfigs();
         this.setDomElements();
+        this.returnToHomeScreen();
     }
 
 
@@ -15,15 +16,14 @@ export class View {
         document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
     }
 
-    // applyBaseStyles() {
-    //     const root = document.documentElement;
-    //     root.style.setProperty('--base-unit', 
-    //         window.matchMedia('(orientation: portrait)').matches ? 
-    //         LAYOUT.BASE_UNIT.PORTRAIT : 
-    //         LAYOUT.BASE_UNIT.LANDSCAPE
-    //     );
-    //     document.body.style.background = COLORS.BACKGROUND.GRADIENT;
-    // }
+    applyColorConfigs() {
+        document.documentElement.style.setProperty('--score-color', COLORS.SCORE);
+        document.documentElement.style.setProperty('--chart-bar-color', COLORS.CHART_BAR);
+        document.documentElement.style.setProperty('--letter-path-selected', COLORS.LETTER_PATH_SELECTED);
+        document.documentElement.style.setProperty('--primary-background-color', COLORS.BACKGROUND.PRIMARY);
+        document.documentElement.style.setProperty('--secondary-background-color', COLORS.BACKGROUND.SECONDARY);
+        document.documentElement.style.setProperty('--primary-text-color', COLORS.TEXT.PRIMARY);
+    }
 
     setDomElements() {
         this.screens = document.querySelectorAll('.screen');
@@ -61,7 +61,6 @@ export class View {
     blurActiveElement() {
         document.activeElement.blur();
     }
-
 
     /*................................HOME................................*/
     

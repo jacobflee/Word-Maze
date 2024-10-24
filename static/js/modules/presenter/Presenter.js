@@ -1,5 +1,4 @@
 import { Animations } from "./Animations.js";
-import { secondsToMSS } from '../utils.js'
 
 
 export class Presenter {
@@ -7,9 +6,6 @@ export class Presenter {
         this.model = model;
         this.view = view;
         this.animations = new Animations(view);
-
-        this.view.setAppHeight();
-        this.view.returnToHomeScreen();
         this.setEventListeners();
         this.setUsername();
     }
@@ -78,8 +74,7 @@ export class Presenter {
 
     updateTimer() {
         const gameState = this.model.gameState;
-        const timeString = secondsToMSS(gameState.secondsRemaining);
-        this.view.updateCountdownTimer(timeString, gameState.countdownTimerColor);
+        this.view.updateCountdownTimer(gameState.timeString, gameState.countdownTimerColor);
         if (gameState.secondsRemaining <= 0)
             this.displayResults();
     }
