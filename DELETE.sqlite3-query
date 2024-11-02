@@ -1,0 +1,3 @@
+-- database: /Users/jacob/Workspace/Word-Maze/database.db
+
+DELETE FROM users;

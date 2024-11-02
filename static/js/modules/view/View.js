@@ -4,35 +4,46 @@ import { COLORS } from '../config.js';
 export class View {
     constructor() {
         this.setAppHeight();
-        this.applyColorConfigs();
-        this.setDomElements();
-        this.returnToHomeScreen();
+        this.setColorConfigs();
+        this.setDOMReferences();
+        this.hideInputErrors();
+        this.createSpooler();
+        this.switchToHomeScreen();
     }
 
 
-    /*................................GLOBAL................................*/
+    /*................GLOBAL................*/
 
     setAppHeight() {
         document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
     }
 
-    applyColorConfigs() {
+    setColorConfigs() {
         document.documentElement.style.setProperty('--score-color', COLORS.SCORE);
         document.documentElement.style.setProperty('--chart-bar-color', COLORS.CHART_BAR);
         document.documentElement.style.setProperty('--letter-path-selected', COLORS.LETTER_PATH_SELECTED);
         document.documentElement.style.setProperty('--primary-background-color', COLORS.BACKGROUND.PRIMARY);
         document.documentElement.style.setProperty('--secondary-background-color', COLORS.BACKGROUND.SECONDARY);
+        document.documentElement.style.setProperty('--primary-highlight-color', COLORS.HIGHLIGHT.PRIMARY);
+        document.documentElement.style.setProperty('--secondary-highlight-color', COLORS.HIGHLIGHT.SECONDARY);
         document.documentElement.style.setProperty('--primary-text-color', COLORS.TEXT.PRIMARY);
+        document.documentElement.style.setProperty('--secondary-text-color', COLORS.TEXT.SECONDARY);
+        document.documentElement.style.setProperty('--tertiary-text-color', COLORS.TEXT.TERTIARY);
     }
 
-    setDomElements() {
+    setDOMReferences() {
         this.screens = document.querySelectorAll('.screen');
         this.homeBtns = document.querySelectorAll('.home-btn');
+        this.inputBorders = document.querySelectorAll('.input-border');
+        this.inputErrors = document.querySelectorAll('.input-error');
 
         this.homeScreen = document.getElementById('home-screen');
         this.usernameForm = document.getElementById('username-form');
         this.usernameInput = document.getElementById('username');
         this.modeSelectBtns = document.querySelectorAll('.mode-select-btn');
+
+        this.friendScreen = document.getElementById('friend-screen');
+        this.searchForm = document.getElementById('search-form');
 
         this.gameScreen = document.getElementById('game-screen');
         this.letterPath = document.getElementById('letter-path');
@@ -53,66 +64,116 @@ export class View {
         this.barCounts = document.querySelectorAll('.bar-count');
     }
 
-    changeScreen(screen) {
+    createSpooler() {
+        this.spooler = document.createElement("i");
+        this.spooler.className = "icon-spooler";
+    }
+
+    switchScreen(screen) {
         this.screens.forEach((screen) => screen.style.display = 'none');
         screen.style.display = '';
+    }
+
+    switchToHomeScreen() {
+        this.switchScreen(this.homeScreen);
     }
 
     blurActiveElement() {
         document.activeElement.blur();
     }
 
-    /*................................HOME................................*/
+    getElementAtTouchPoint(touch) {
+        return document.elementFromPoint(touch.clientX, touch.clientY);
+    }
+
+    setInputErrors(color, display) {
+        this.inputBorders.forEach((inputBorder) => {
+            inputBorder.style.setProperty("--input-border-color", color);
+        });
+        this.inputErrors.forEach((inputError) => {
+            inputError.style.display = display;
+        });
+    }
+
+    showInputErrors() {
+        this.setInputErrors(COLORS.HIGHLIGHT.SECONDARY, '');
+    }
+
+    hideInputErrors() {
+        this.setInputErrors('', 'none');
+    }
     
+
+    /*................HOME................*/
+
     setUsername(username) {
         this.usernameInput.value = username;
+        this.setUsernameWidth();
     }
 
     setUsernameWidth() {
-        const length = this.usernameInput.value.length;
-        this.usernameInput.style.width = `${Math.max(length, 15)}ch`;
-    }
-
-    returnToHomeScreen() {
-        this.changeScreen(this.homeScreen);
+        this.usernameInput.style.width = `${this.usernameInput.value.length}ch`;
+        this.hideInputErrors();
     }
 
     selectTimedMode() {
         this.navControls.style.display = 'none';
         this.countdownTimer.style.display = '';
-        this.changeScreen(this.gameScreen);
+        this.startMode();
     }
-    
+
     selectFreePlayMode() {
         this.navControls.style.display = '';
         this.countdownTimer.style.display = 'none';
-        this.changeScreen(this.gameScreen);
+        this.startMode();
     }
 
     selectVSFriendMode() {
-        // implement
+        this.switchScreen(this.friendScreen);
     }
 
     selectVSRandomMode() {
         // implement
     }
 
+    startMode() {
+        this.updateWordCount(0);
+        this.setCurrentScore(0);
+        this.switchScreen(this.gameScreen);
+    }
 
-    /*................................GAME................................*/
+    setButtonAsLoading(button) {
+        const [icon, text] = button.children;
+        button.insertBefore(this.spooler, icon);
+        icon.style.display = 'none';
+        text.textContent = '';
+        text.className = 'loader';
+    }
 
-    updateCountdownTimer(timeString, color) {
+    resetButton(button) {
+        button.removeChild(this.spooler);
+        const [icon, text] = button.children;
+        icon.style.display = '';
+        text.className = '';
+        text.textContent = button.dataset.mode;
+    }
+
+
+    /*................GAME................*/
+
+    updateTimer(timeString, color) {
         this.countdownTimer.textContent = timeString;
         this.countdownTimer.style.color = color;
     }
 
-    setCellStyle(cell, side, radius, fontSize) {
+    updateCellStyle(cell, side, radius, fontSize) {
         cell.style.width = side;
         cell.style.height = side;
         cell.style.borderRadius = radius;
         cell.style.fontSize = fontSize;
     }
 
-    drawCircle(cx, cy, r) {
+    createSelectionCircle(cx, cy, r) {
         const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
         circle.setAttribute('cx', cx);
         circle.setAttribute('cy', cy);
@@ -120,7 +181,7 @@ export class View {
         this.letterPath.appendChild(circle);
     }
 
-    drawLine(strokeWidth, x1, y1, x2, y2) {
+    createConnectionLine(strokeWidth, x1, y1, x2, y2) {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
         line.setAttribute('stroke-width', strokeWidth);
         line.setAttribute('x1', x1);
@@ -156,27 +217,29 @@ export class View {
         selectedCells.forEach((cell) => this.setCellColor(cell, ''));
     }
 
-    updateSelectedLetters(text, backgroundColor, color, fontWeight, value, cellsToColor, currentCellColor) {
-        this.selectedLetters.textContent = text;
-        this.selectedLetters.style.backgroundColor = backgroundColor;
-        this.selectedLetters.style.color = color;
-        this.selectedLetters.style.fontWeight = fontWeight;
-        this.letterPath.style.fill = value;
-        this.letterPath.style.stroke = value;
-        cellsToColor.forEach((cell) => this.setCellColor(cell, currentCellColor));
+    updateSelectedLetters(current) {
+        const { word, path, cell } = current;
+        this.selectedLetters.textContent = word.content;
+        this.selectedLetters.style.backgroundColor = word.background;
+        this.selectedLetters.style.color = word.color;
+        this.selectedLetters.style.fontWeight = word.weight;
+        this.letterPath.style.fill = path.color;
+        this.letterPath.style.stroke = path.color;
+        path.targets.forEach((target) => this.setCellColor(target, cell.color));
     }
 
     setCellColor(cell, color) {
         cell.firstElementChild.style.borderColor = color;
         cell.style.color = color;
     }
-    
-    /*................................RESULTS................................*/
+
+
+    /*................RESULTS................*/
 
     displayResults(currentScore, longestWord) {
         this.finalScore.textContent = currentScore;
         this.longestWord.textContent = longestWord;
-        this.changeScreen(this.resultsScreen);
+        this.switchScreen(this.resultsScreen);
     }
 
     updateChartBar(i, width, count) {

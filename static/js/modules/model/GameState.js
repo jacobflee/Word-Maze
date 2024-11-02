@@ -8,48 +8,52 @@ export class GameState {
     }
 
     reset() {
-        this.foundWords = Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i + 3, new Set()]));
-        this.wordLengthDistribution = Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i + 3, 0]));
-        this.wordCount = 0;
         this.score = 0;
-        this.validWords = {};
-        this.secondsRemaining = TIMING.GAME_DURATION;
-        this.longestWord = '';
-        this.countdownTimerColor = '';
-        this.timerId = null;
-        this.timeString = '';
+        this.words = {
+            count: 0,
+            longest: '',
+            valid: null,
+            found: Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i + 3, new Set()])),
+            length: Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i + 3, 0])),
+        };
+        this.time = {
+            id: null,
+            color: '',
+            text: '',
+            seconds: TIMING.GAME_DURATION,
+        }
     }
 
-    startTimer(callback) {
-        this.timer(callback);
-        this.timerId = setInterval(() => this.timer(callback), 1000);
+    startTimer(updateTimer) {
+        this.updateTimer(updateTimer);
+        this.time.id = setInterval(() => this.updateTimer(updateTimer), 1000);
     }
 
-    timer(callback) {
-        this.secondsRemaining--;
-        this.timeString = secondsToMSS(this.secondsRemaining);
-        this.countdownTimerColor = this.secondsRemaining < 10 ? '#F00' : '';
-        callback();
-        if (this.secondsRemaining <= 0) {
-            clearInterval(this.timerId);
-            this.timerId = null;
+    updateTimer(updateTimer) {
+        this.time.seconds--;
+        this.time.text = secondsToMSS(this.time.seconds);
+        this.time.color = this.time.seconds < 10 ? COLORS.TEXT.TERTIARY : '';
+        updateTimer();
+        if (this.time.seconds === 0) {
+            clearInterval(this.time.id);
+            this.time.id = null;
         }
     }
 
     updateValidWords(words) {
-        this.validWords = Object.fromEntries(Object.entries(words).map(([wordLength, words]) => [wordLength, new Set(words)]));
+        this.words.valid = Object.fromEntries(Object.entries(words).map(([length, words]) => [length, new Set(words)]));
     }
 
-    getValidity(word) {
-        return [this.validWords[word.length]?.has(word), this.foundWords[word.length]?.has(word)];
+    checkWordValidity(word) {
+        return [this.words.valid[word.length]?.has(word), this.words.found[word.length]?.has(word)];
     }
 
     addFoundWord(word) {
-        this.wordCount++;
-        this.foundWords[word.length].add(word);
-        this.wordLengthDistribution[word.length]++;
+        this.words.count++;
+        this.words.found[word.length].add(word);
+        this.words.length[word.length]++;
         this.score += POINTS[word.length];
-        if (word.length > this.longestWord.length)
-            this.longestWord = word;
+        if (word.length > this.words.longest.length)
+            this.words.longest = word;
     }
 }

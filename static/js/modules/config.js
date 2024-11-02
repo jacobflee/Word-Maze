@@ -8,11 +8,17 @@ export const COLORS = {
     LETTER_PATH_VALID: '#FFF',
     WORD_VALID: '#000',
     BACKGROUND: {
-        PRIMARY: '#0D202D',
-        SECONDARY: '#040008',
+        PRIMARY: '#126',
+        SECONDARY: '#000',
+    },
+    HIGHLIGHT: {
+        PRIMARY: '#01AFD1',
+        SECONDARY: '#F00',
     },
     TEXT: {
         PRIMARY: '#FFF',
+        SECONDARY: '#888',
+        TERTIARY: '#F00',
     },
 };
 
@@ -36,8 +42,8 @@ export const TIMING = {
     GAME_DURATION: 91,
     ANIMATION: {
         CELL_SELECTION: 12,
-        WORD_FADE: 12,
-        SCORE_INCREMENT: 28,
+        WORD_FADE_OUT: 12,
+        SCORE_INCREASE: 28,
         BAR_GRAPH: 120,
     },
 };

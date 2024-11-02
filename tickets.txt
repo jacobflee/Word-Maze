@@ -1,0 +1,57 @@
+change username to userName
+
+
+you are using the cell element color to make decisions in the model
+    but that is not good code, you should store the state of the gameboard
+    in the model and update the view according to how the model's gameboard
+    is modified. this will remove the need for config to define cell colors
+    as rgb, since browsers normalize color values to rgb format. if one browser
+    normalizes to hex, then your game is broken.
+
+
+there is currently a lot of model logic and view logic and occuring in the Presenter
+    like with specifying the button and mode (view)
+    or with the switch statement for the mode (model)
+
+
+fix naming (selectedLetters is current word text)
+
+
+refactor to minimize dom repaints, anytime a style is set in js a repaint is triggered
+
+
+implement local storage handler
+    user id
+        user name
+        user ids (friends)
+        user stats
+            high_score
+            longest_word
+            game_count
+            wins
+            losses
+            ties
+            word_count
+            word_length_distribution
+
+
+after each game update local storage user stats
+
+
+create screen to display user stats
+
+
+create vars for named sizes like font size and width
+    then have claude write names for isolating sizes
+
+
+generate gameboards during downtime to dish out later
+
+
+gameboards shouldn't contain >2 of the same letter
+
+
+gameboards made with word injection should follow a distribution
+    to ensure not every board will have a 14/15 letter word
+    some boards may just have a 9/10 letter word
+    this makes the highest scoring words rare

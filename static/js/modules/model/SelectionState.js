@@ -7,79 +7,102 @@ export class SelectionState {
     }
 
     reset() {
-        this.selectedLetters = '';
-        this.isSelecting = false;
-        this.isValidWord = false;
-        this.isFoundWord = false;
-        this.lastSelectedRow = null;
-        this.lastSelectedColumn = null;
-        this.selectedCells = [];
-        this.currentCellColor = '';
-        this.previousCellsColor = '';
-        this.lastSelectedCell = null;
-        this.currentPathColor = null;
-        this.wordDisplay = '';
-        this.wordDisplayBackgroundColor = null;
-        this.wordDisplayColor = null;
-        this.wordDisplayFontWeight = null;
-        this.cellsToColor = [];
-        this.currentWordPoints = 0;
-        this.targetCell = null;
-        this.targetCellIsValid = false;
+        this.selecting = false;
+
+        this.current = {
+            word: {
+                text: '',
+                content: '',
+                weight: '',
+                background: '',
+                color: '',
+                points: 0,
+                valid: false,
+                found: false,
+            },
+            cell: {
+                element: null,
+                color: '',
+                letter: '',
+                row: null,
+                column: null,
+                valid: false,
+            },
+            path: {
+                elements: [],
+                color: '',
+                targets: [],
+            }
+        };
+
+        this.previous = {
+            cell: {
+                element: null,
+                color: '',
+                row: null,
+                column: null,
+            }
+        };
     }
 
-    updateTargetCell(targetCell) {
-        this.targetCell = targetCell;
-        this.targetCellIsValid = this.isTargetCellValid();
+    start() {
+        this.selecting = true;
     }
 
-    isTargetCellValid() {
-        if (this.targetCell.style.color !== '') return false;
-        if (!this.lastSelectedRow) return true;
-        const rowDiff = Math.abs(this.targetCell.style.gridRowStart - this.lastSelectedRow);
-        const colDiff = Math.abs(this.targetCell.style.gridColumnStart - this.lastSelectedColumn);
-        return rowDiff <= 1 && colDiff <= 1;
-    }
-
-    setIsSelecting(value) {
-        this.isSelecting = value;
-    }
-
-    updateValidity(isValidWord, isFoundWord) {
-        this.isValidWord = isValidWord;
-        this.isFoundWord = isFoundWord;
-    }
-
-    addCellBeforeValidation(cell) {
-        this.selectedCells.push(cell);
-        this.lastSelectedCell = cell;
-        this.selectedLetters += cell.firstElementChild.textContent;
-        this.lastSelectedRow = cell.style.gridRowStart;
-        this.lastSelectedColumn = cell.style.gridColumnStart;
-    }
-
-    updateCellAfterValidation(cell) {
-        this.previousCellsColor = this.currentCellColor;
-        if (this.isValidWord) {
-            const color = this.isFoundWord ? COLORS.DUPLICATE : COLORS.VALID;
-            this.currentCellColor = color;
-            this.currentPathColor = COLORS.LETTER_PATH_VALID;
-            this.currentWordPoints = POINTS[this.selectedLetters.length];
-            this.wordDisplayBackgroundColor = color;
-            this.wordDisplay = `${this.selectedLetters} (+${this.currentWordPoints})`;
-            this.wordDisplayColor = COLORS.WORD_VALID;
-            this.wordDisplayFontWeight = 500;
-        } else {
-            this.currentCellColor = COLORS.SELECTED;
-            this.currentPathColor = '';
-            this.wordDisplay = this.selectedLetters;
-            this.wordDisplayBackgroundColor = '';
-            this.wordDisplayColor = '';
-            this.wordDisplayFontWeight = '';
+    updateTargetCell(cell) {
+        this.current.cell = {
+            element: cell,
+            color: cell.style.color,
+            letter: cell.firstElementChild.textContent,
+            row: cell.style.gridRowStart,
+            column: cell.style.gridColumnStart,
         }
-        if (this.previousCellsColor === this.currentCellColor)
-            this.cellsToColor = [cell];
-        else
-            this.cellsToColor = this.selectedCells;
+        this.current.cell.valid = this.checkCellValidity();
+    }
+
+    checkCellValidity() {
+        if (this.current.cell.color !== '') return false;
+        if (!this.previous.cell.row) return true;
+        const rowDifference = Math.abs(this.current.cell.row - this.previous.cell.row);
+        const columnDifferent = Math.abs(this.current.cell.column - this.previous.cell.column);
+        return rowDifference <= 1 && columnDifferent <= 1;
+    }
+
+    updateSelectedCell() {
+        const { word, cell, path } = this.current;
+        path.elements.push(cell.element);
+        word.text += cell.letter;
+        this.previous.cell = { ...cell };
+    }
+
+    updateValidatedCell(valid, found) {
+        const { word, cell, path } = this.current;
+        word.valid = valid;
+        word.found = found;
+        if (valid) {
+            const points = POINTS[word.text.length];
+            const color = found
+                ? COLORS.DUPLICATE
+                : COLORS.VALID;
+            word.points = points;
+            word.background = color;
+            word.color = COLORS.WORD_VALID;
+            word.weight = 500;
+            word.content = found
+                ? word.text
+                : `${word.text} (+${points})`;
+            cell.color = color;
+            path.color = COLORS.LETTER_PATH_VALID;
+        } else {
+            word.background = '';
+            word.color = '';
+            word.weight = '';
+            word.content = word.text;
+            cell.color = COLORS.SELECTED;
+            path.color = '';
+        }
+        path.targets = this.previous.cell.color === cell.color
+            ? [cell.element]
+            : path.elements;
     }
 }
