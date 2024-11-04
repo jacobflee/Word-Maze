@@ -1,12 +1,12 @@
-change username to userName
-
-
 you are using the cell element color to make decisions in the model
     but that is not good code, you should store the state of the gameboard
     in the model and update the view according to how the model's gameboard
     is modified. this will remove the need for config to define cell colors
     as rgb, since browsers normalize color values to rgb format. if one browser
     normalizes to hex, then your game is broken.
+
+
+check for other examples if using the dom as a state (like with gameboard)
 
 
 there is currently a lot of model logic and view logic and occuring in the Presenter

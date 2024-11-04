@@ -7,7 +7,7 @@ export class Presenter {
         this.view = view;
         this.animations = new Animations(view);
         this.initializeEventHandlers();
-        this.setUsername();
+        this.setUserName();
     }
 
     initializeEventHandlers() {
@@ -20,16 +20,16 @@ export class Presenter {
             'click',
             () => this.view.switchToHomeScreen()
         );
-        
+
         // USERNAME
-        this.view.usernameInput.addEventListener('input', () => this.view.setUsernameWidth());
-        this.view.usernameForm.addEventListener('submit', (event) => this.updateUsername(event));
+        this.view.userNameInput.addEventListener('input', () => this.view.setUserNameWidth());
+        this.view.userNameForm.addEventListener('submit', (event) => this.updateUserName(event));
         this.addEventListeners(
             window,
             ['touchend', 'mouseup'],
             () => this.hideInputErrors()
         );
-        
+
         // MODES
         this.addEventListeners(
             this.view.modeSelectBtns,
@@ -51,7 +51,7 @@ export class Presenter {
             ['touchcancel', 'touchend', 'mouseup'],
             () => this.endSelection()
         );
-        
+
         // RESULTS
         this.view.resultsBtn.addEventListener('click', () => this.displayResults());
     }
@@ -69,17 +69,17 @@ export class Presenter {
 
     /*................HOME................*/
 
-    setUsername() {
-        const username = this.model.getUsername();
-        this.view.setUsername(username);
+    setUserName() {
+        const userName = this.model.getUserName();
+        this.view.setUserName(userName);
     }
 
-    async updateUsername(event) {
+    async updateUserName(event) {
         event.preventDefault();
-        const username = event.currentTarget.username.value;
-        await this.model.setUsername(username);
-        console.log(this.model.userId, this.model.usernameValid);
-        // if (usernameValid) {
+        const userName = event.currentTarget.userName.value;
+        await this.model.setUserName(userName);
+        console.log(this.model.userId, this.model.userNameValid);
+        // if (userNameValid) {
         //     this.view.blurActiveElement();
         // } else {
         //     this.view.showInputErrors();
@@ -108,15 +108,15 @@ export class Presenter {
                 this.view.selectFreePlayMode();
                 break;
             case 'VS Friend':
-                if (this.model.getUsername() === '') {
-                    this.view.usernameInput.focus();
+                if (this.model.getUserName() === '') {
+                    this.view.userNameInput.focus();
                 } else {
                     this.view.selectVSFriendMode();
                 }
                 break;
             case 'VS Random':
-                if (this.model.getUsername() === '') {
-                    this.view.usernameInput.focus();
+                if (this.model.getUserName() === '') {
+                    this.view.userNameInput.focus();
                 } else {
                     this.view.selectVSRandomMode();
                 }
@@ -127,13 +127,8 @@ export class Presenter {
     }
 
     async initializeGameData() {
-        const gameboard = await this.model.getGameboard();
-        for (let i = 0; i < 16; i++) {
-            const row = Math.floor(i / 4);
-            const col = i % 4;
-            const letter = gameboard[row][col]
-            this.view.setLetterText(i, letter);
-        }
+        await this.model.getGameBoard();
+        this.model.selectionState.board.forEach((cell, i) => this.view.setLetterText(cell.letter, i));
     }
 
 
@@ -141,8 +136,8 @@ export class Presenter {
 
     searchFriend(event) {
         event.preventDefault();
-        const username = event.currentTarget.username.value;
-        console.log(username);
+        const userName = event.currentTarget['user-name'].value;
+        console.log(userName);
         // TODO: show either friend card with an add friend button or no friend found
     }
 
@@ -169,33 +164,36 @@ export class Presenter {
             if (touchTarget?.className !== 'touch-target') return;
         } else
             var touchTarget = event.currentTarget;
-        this.model.selectionState.updateTargetCell(touchTarget.parentElement);
-        const current = this.model.selectionState.current;
-        if (!current.cell.valid) return;
-        this.animations.cellSelection(current.cell.element.firstElementChild);
+        const targetCell = touchTarget.parentElement;
+        const index = targetCell.dataset.index;
+        this.model.selectionState.updateTargetCell(targetCell, index);
+        if (!this.model.selectionState.cell.valid) return;
+        this.animations.cellSelection(this.model.selectionState.cell.current.element.firstElementChild);
         this.drawPath();
-        this.model.addSelectedCell(current.cell.element);
-        this.view.updateSelectedLetters(current);
+        this.model.addSelectedCell();
+        const word = this.model.selectionState.word;
+        const path = this.model.selectionState.path;
+        const cell = this.model.selectionState.cell.current;
+        this.view.updateSelectedLetters(word, path, cell);
     }
 
     drawPath() {
-        const previous = this.model.selectionState.previous;
         this.drawSelectionCircle();
-        if (previous.cell.row) this.drawConnectionLine();
+        if (this.model.selectionState.cell.previous.row) this.drawConnectionLine();
     }
 
     drawSelectionCircle() {
-        const current = this.model.selectionState.current;
-        const [cx, cy] = this.getCellCenter(current.cell.element);
-        const r = current.cell.element.clientWidth / 14.5;
+        const current = this.model.selectionState.cell.current;
+        const [cx, cy] = this.getCellCenter(current.element);
+        const r = current.element.clientWidth / 14.5;
         this.view.createSelectionCircle(cx, cy, r);
     }
 
     drawConnectionLine() {
-        const { current, previous } = this.model.selectionState;
-        const strokeWidth = current.cell.element.clientWidth / 6.5;
-        const [x1, y1] = this.getCellCenter(previous.cell.element);
-        const [x2, y2] = this.getCellCenter(current.cell.element);
+        const { current, previous } = this.model.selectionState.cell;
+        const strokeWidth = current.element.clientWidth / 6.5;
+        const [x1, y1] = this.getCellCenter(previous.element);
+        const [x2, y2] = this.getCellCenter(current.element);
         this.view.createConnectionLine(strokeWidth, x1, y1, x2, y2);
     }
 
@@ -206,26 +204,27 @@ export class Presenter {
     }
 
     endSelection() {
-        const { selecting, current } = this.model.selectionState;
+        const selecting = this.model.selectionState.selecting;
         if (!selecting) return;
-        const { word, path } = current;
+        const word = this.model.selectionState.word;
+        const path = this.model.selectionState.path;
         if (word.valid && !word.found) {
-            const { score, words } = this.model.gameState;
-            this.animations.scoreIncrease(score, word.points);
+            const { game, words } = this.model.gameState;
+            this.animations.scoreIncrease(game.score, word.points);
             this.model.addFoundWord();
             this.view.updateWordCount(words.count);
         }
         this.animations.wordFadeOut();
         this.view.resetLetterPathAndSelectedCells(path.elements);
-        this.model.selectionState.reset();
+        this.model.reset();
     }
 
 
     /*................RESULTS................*/
 
     displayResults() {
-        const { score, words } = this.model.gameState;
-        this.view.displayResults(score, words.longest);
+        const { game, words } = this.model.gameState;
+        this.view.displayResults(game.score, words.longest);
         if (words.count === 0)
             for (let i = 0; i < 13; i++) this.view.updateChartBar(i, '0%', '0');
         else

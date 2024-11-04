@@ -254,7 +254,7 @@ input:not(:focus)~.input-error {
     margin-right: calc(2 * var(--base-unit));
 }
 
-#username {
+#user-name {
     text-align: center;
     font-size: calc(4 * var(--base-unit));
     min-width: 17ch;
@@ -262,7 +262,7 @@ input:not(:focus)~.input-error {
     caret-color: var(--secondary-text-color);
 }
 
-#username::placeholder {
+#user-name::placeholder {
     color: var(--secondary-text-color);
 }
 

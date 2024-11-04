@@ -8,20 +8,31 @@ export class GameState {
     }
 
     reset() {
-        this.score = 0;
         this.words = {
             count: 0,
             longest: '',
             valid: null,
-            found: Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i + 3, new Set()])),
-            length: Object.fromEntries(Array.from({ length: 13 }, (_, i) => [i + 3, 0])),
+            found: this.createObject(13, (i) => i + 3, () => new Set()),
+            length: this.createObject(13, (i) => i + 3, () => 0),
         };
         this.time = {
             id: null,
             color: '',
-            text: '',
+            content: '',
             seconds: TIMING.GAME_DURATION,
+        };
+        this.game = {
+            score: 0,
         }
+    }
+
+    createObject(length, key, value) {
+        return Object.fromEntries(
+            Array.from(
+                { length },
+                (_, i) => [key(i), value(i)]
+            )
+        )
     }
 
     startTimer(updateTimer) {
@@ -41,7 +52,11 @@ export class GameState {
     }
 
     updateValidWords(words) {
-        this.words.valid = Object.fromEntries(Object.entries(words).map(([length, words]) => [length, new Set(words)]));
+        this.words.valid = Object.fromEntries(
+            Object.entries(words).map(
+                ([length, words]) => [length, new Set(words)]
+            )
+        );
     }
 
     checkWordValidity(word) {
@@ -52,7 +67,7 @@ export class GameState {
         this.words.count++;
         this.words.found[word.length].add(word);
         this.words.length[word.length]++;
-        this.score += POINTS[word.length];
+        this.game.score += POINTS[word.length];
         if (word.length > this.words.longest.length)
             this.words.longest = word;
     }

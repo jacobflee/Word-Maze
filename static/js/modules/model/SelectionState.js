@@ -3,82 +3,96 @@ import { COLORS, POINTS } from '../config.js';
 
 export class SelectionState {
     constructor() {
+        this.board = Array.from({ length: 16 }, () => ({}));
         this.reset();
     }
 
     reset() {
         this.selecting = false;
 
-        this.current = {
-            word: {
-                text: '',
-                content: '',
-                weight: '',
-                background: '',
-                color: '',
-                points: 0,
-                valid: false,
-                found: false,
-            },
-            cell: {
-                element: null,
-                color: '',
-                letter: '',
-                row: null,
-                column: null,
-                valid: false,
-            },
-            path: {
-                elements: [],
-                color: '',
-                targets: [],
-            }
+        this.word = {
+            text: '',
+            content: '',
+            weight: '',
+            background: '',
+            color: '',
+            points: 0,
+            valid: false,
+            found: false,
         };
 
-        this.previous = {
-            cell: {
+        this.cell = {
+            index: -1,
+            valid: false,
+            current: {
                 element: null,
+                row: 0,
+                column: 0,
                 color: '',
-                row: null,
-                column: null,
-            }
+            },
+            previous: {
+                element: null,
+                row: 0,
+                column: 0,
+                color: '',
+            },
         };
+
+        this.path = {
+            elements: [],
+            targets: [],
+            color: '',
+        };
+
+        this.board.forEach((cell) => cell.color = '');
+    }
+
+    updateBoard(board) {
+        for (let i = 0; i < 16; i++) {
+            const row = Math.floor(i / 4);
+            const column = i % 4;
+            this.board[i] = {
+                row: row + 1,
+                column: column + 1,
+                letter: board[row][column],
+                color: '',
+            }
+        }
     }
 
     start() {
         this.selecting = true;
     }
 
-    updateTargetCell(cell) {
-        this.current.cell = {
-            element: cell,
-            color: cell.style.color,
-            letter: cell.firstElementChild.textContent,
-            row: cell.style.gridRowStart,
-            column: cell.style.gridColumnStart,
-        }
-        this.current.cell.valid = this.checkCellValidity();
+    updateTargetCell(element, index) {
+        this.cell.current = this.board[i];
+        this.cell.current.element = element;
+        this.cell.index = index;
+        this.cell.valid = this.checkCellValidity();
     }
 
     checkCellValidity() {
-        if (this.current.cell.color !== '') return false;
-        if (!this.previous.cell.row) return true;
-        const rowDifference = Math.abs(this.current.cell.row - this.previous.cell.row);
-        const columnDifferent = Math.abs(this.current.cell.column - this.previous.cell.column);
+        const { current, previous } = this.cell;
+        if (current.color !== '') return false;
+        if (previous.row === 0) return true;
+        const rowDifference = Math.abs(current.row - previous.row);
+        const columnDifferent = Math.abs(current.column - previous.column);
         return rowDifference <= 1 && columnDifferent <= 1;
     }
 
     updateSelectedCell() {
-        const { word, cell, path } = this.current;
-        path.elements.push(cell.element);
-        word.text += cell.letter;
-        this.previous.cell = { ...cell };
+        this.path.elements.push(this.cell.current.element);
+        this.word.text += this.cell.letter;
+        this.cell.previous = { ...this.cell.current };
     }
 
     updateValidatedCell(valid, found) {
-        const { word, cell, path } = this.current;
+        const word = this.word;
+        const cell = this.cell.current;
+        const path = this.path;
         word.valid = valid;
         word.found = found;
+        let cellColor;
         if (valid) {
             const points = POINTS[word.text.length];
             const color = found
@@ -93,6 +107,7 @@ export class SelectionState {
                 : `${word.text} (+${points})`;
             cell.color = color;
             path.color = COLORS.LETTER_PATH_VALID;
+            cellColor = color;
         } else {
             word.background = '';
             word.color = '';
@@ -100,9 +115,14 @@ export class SelectionState {
             word.content = word.text;
             cell.color = COLORS.SELECTED;
             path.color = '';
+            cellColor = COLORS.SELECTED;
         }
-        path.targets = this.previous.cell.color === cell.color
+        path.targets = this.cell.previous.color === cell.color
             ? [cell.element]
             : path.elements;
+        path.targets.forEach((element) => {
+            const i = element.dataset.index; // LMAO I thought we werent accessing element attrs in model mmm?
+            this.board[i].color = cellColor;
+        })
     }
 }

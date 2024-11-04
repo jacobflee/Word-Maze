@@ -38,8 +38,8 @@ export class View {
         this.inputErrors = document.querySelectorAll('.input-error');
 
         this.homeScreen = document.getElementById('home-screen');
-        this.usernameForm = document.getElementById('username-form');
-        this.usernameInput = document.getElementById('username');
+        this.userNameForm = document.getElementById('user-name-form');
+        this.userNameInput = document.getElementById('user-name');
         this.modeSelectBtns = document.querySelectorAll('.mode-select-btn');
 
         this.friendScreen = document.getElementById('friend-screen');
@@ -106,13 +106,13 @@ export class View {
 
     /*................HOME................*/
 
-    setUsername(username) {
-        this.usernameInput.value = username;
-        this.setUsernameWidth();
+    setUserName(userName) {
+        this.userNameInput.value = userName;
+        this.setUserNameWidth();
     }
 
-    setUsernameWidth() {
-        this.usernameInput.style.width = `${this.usernameInput.value.length}ch`;
+    setUserNameWidth() {
+        this.userNameInput.style.width = `${this.userNameInput.value.length}ch`;
         this.hideInputErrors();
     }
 
@@ -208,8 +208,8 @@ export class View {
         this.selectedLetters.style.opacity = opacity;
     }
 
-    setLetterText(i, text) {
-        this.letters[i].textContent = text;
+    setLetterText(letter, i) {
+        this.letters[i].textContent = letter;
     }
 
     resetLetterPathAndSelectedCells(selectedCells) {
@@ -217,8 +217,7 @@ export class View {
         selectedCells.forEach((cell) => this.setCellColor(cell, ''));
     }
 
-    updateSelectedLetters(current) {
-        const { word, path, cell } = current;
+    updateSelectedLetters(word, path, cell) {
         this.selectedLetters.textContent = word.content;
         this.selectedLetters.style.backgroundColor = word.background;
         this.selectedLetters.style.color = word.color;

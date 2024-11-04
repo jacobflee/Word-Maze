@@ -1,7 +1,7 @@
 export const COLORS = {
-    DUPLICATE: 'rgb(220, 220, 40)',
-    VALID: 'rgb(20, 180, 40)',
-    SELECTED: 'rgb(40, 80, 240)',
+    DUPLICATE: '#DCDC28',
+    VALID: '#14B428',
+    SELECTED: '#2850F0',
     SCORE: '#FF0',
     CHART_BAR: '#39D',
     LETTER_PATH_SELECTED: '#F00',
