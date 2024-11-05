@@ -62,7 +62,8 @@ export class Animations {
     }
 
     updateChartBar(chartBar, width, count) {
-        chartBar.children[1].style.width = width;
-        chartBar.children[2].textContent = count;
+        const [ _, barFill, barCount ] = chartBar.children;
+        barFill.style.width = width;
+        barCount.textContent = count;
     }
 }

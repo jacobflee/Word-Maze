@@ -23,7 +23,7 @@ export class Presenter {
         addEventListeners(
             this.view.homeBtns,
             'click',
-            () => this.switchScreen('home') // TODO: repaints uneccessary screens
+            () => this.switchScreen('home')
         );
         addEventListeners(
             Object.entries(this.view.modeBtns).map(([_, element]) => element),
@@ -35,25 +35,30 @@ export class Presenter {
             () => this.displayResults()
         );
 
-        // INPUTS
-        this.view.userNameInput.addEventListener(
-            'input',
-            () => this.view.setUserNameWidth() // TODO: repaints uneccessary errors
-        );
+        // FORMS
         this.view.userNameForm.addEventListener(
             'submit',
-            (event) => this.updateUserName(event) // TODO: implement
+            (event) => this.updateUserName(event)
         );
         this.view.searchForm.addEventListener(
             'submit',
             (event) => this.searchFriend(event) // TODO: implement
         );
-        addEventListeners(
-            window,
-            ['touchend', 'mouseup'],
-            () => this.hideInputErrors() // TODO: repaints uneccessary errors
-        );
 
+        // INPUTS
+        this.view.userNameInput.addEventListener(
+            'input',
+            () => this.handleUserNameInput()
+        );
+        this.view.userNameInput.addEventListener(
+            'blur',
+            () => this.handleUserNameInputBlur('user')
+        );
+        this.view.userNameInput.addEventListener(
+            'invalid',
+            (event) => this.handleUserNameInputInvalid(event, 'user')
+        );
+        
         // CELLS
         addEventListeners(
             this.view.touchTargets,
@@ -72,18 +77,39 @@ export class Presenter {
 
     async updateUserName(event) { // TODO: implement
         event.preventDefault();
-        const userName = event.currentTarget.userName.value;
+        const userName = event.currentTarget['user-name'].value;
         await this.model.setUserName(userName);
-        console.log(this.model.userId, this.model.userNameValid);
-        // if (userNameValid) {
-        //     this.view.blurActiveElement();
-        // } else {
-        //     this.view.showInputErrors();
-        // }
+        if (this.model.user.error) {
+            this.view.showInputError('user');
+        } else {
+            this.view.hideInputError('user');
+            this.view.blurActiveElement();
+        }
     }
 
-    hideInputErrors() {
-        this.view.hideInputErrors(); // TODO: hides uneccessary errors
+    resetInputError(form) {
+        if (!this.model[form].error) return;
+        this.model.resetFormError(form);
+        this.view.hideInputError(form);
+    }
+
+    handleUserNameInputBlur(form) {
+        this.view.setUserName();
+        this.resetInputError(form);
+    }
+
+    handleUserNameInputInvalid(event, form) {
+        event.preventDefault();
+        const error = event.currentTarget.value === ''
+            ? 'username is empty'
+            : 'username has outer spaces';
+        this.model.setFormError(form, error);
+        this.view.showInputError('user');
+    }
+
+    handleUserNameInput() {
+        this.resetInputError('user');
+        this.view.setUserNameWidth();
     }
 
     async startMode(event) { // TODO: implement
@@ -103,14 +129,14 @@ export class Presenter {
                 this.view.selectFreePlayMode();
                 break;
             case 'friend':
-                if (this.model.username === '') {
+                if (this.model.user.name === '') {
                     this.view.userNameInput.focus();
                 } else {
                     this.switchScreen('friend');
                 }
                 break;
             case 'random':
-                if (this.model.username === '') {
+                if (this.model.user.name === '') {
                     this.view.userNameInput.focus();
                 } else {
                     this.view.selectVSRandomMode();
@@ -139,7 +165,6 @@ export class Presenter {
     searchFriend(event) {
         event.preventDefault();
         const userName = event.currentTarget['user-name'].value;
-        console.log(userName);
         // TODO: show either friend card with an add friend button or no friend found
     }
 

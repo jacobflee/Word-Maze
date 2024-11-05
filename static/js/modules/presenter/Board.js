@@ -17,8 +17,7 @@ export class Board {
         const index = touchTarget.parentElement.dataset.index;
         selectionState.updateTargetCell(index);
         if (!selectionState.cell.current.valid) return;
-        const cell = this.view.cells[index].firstElementChild;
-        this.view.animations.cellSelection(cell);
+        this.view.animations.cellSelection(this.view.letters[index]);
         this.drawPath();
         this.model.addSelectedCell();
         this.view.updateSelectedLetters();

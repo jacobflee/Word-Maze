@@ -1,5 +1,6 @@
 import { COLORS } from '../config.js';
-import { Animations } from "./Animations.js"
+import { Animations } from './Animations.js'
+import { zip } from '../utils.js'
 
 
 export class View {
@@ -11,8 +12,6 @@ export class View {
         this.setDOMReferences();
         this.setUserName();
         this.initializeScreens();
-
-        this.hideInputErrors(); // TODO: something fishy here
     }
 
 
@@ -37,13 +36,12 @@ export class View {
 
     setDOMReferences() {
         this.homeBtns = document.querySelectorAll('.home-btn');
-        this.inputBorders = document.querySelectorAll('.input-border');
-        this.inputErrors = document.querySelectorAll('.input-error');
+        this.inputBorders = this.createDataSetObject('.input-border', 'form');
 
         this.userNameForm = document.getElementById('user-name-form');
         this.userNameInput = document.getElementById('user-name');
 
-        this.modeBtns =  this.createDataSetObject('.mode-btn', 'mode');
+        this.modeBtns = this.createDataSetObject('.mode-btn', 'mode');
 
         this.searchForm = document.getElementById('search-form');
 
@@ -56,6 +54,7 @@ export class View {
         this.selectedLetters = document.getElementById('selected-letters');
 
         this.cells = document.querySelectorAll('.cell');
+        this.letters = document.querySelectorAll('.letter');
         this.touchTargets = document.querySelectorAll('.touch-target');
 
         this.finalScore = document.getElementById('final-score');
@@ -65,6 +64,18 @@ export class View {
         this.screens = this.createDataSetObject('.screen', 'screen');
 
         this.spooler = this.createSpooler();
+        this.inputError = this.createInputError();
+    }
+
+    createInputError() {
+        const inputError = document.createElement("div");
+        inputError.className = "input-error";
+        const icon = document.createElement("i");
+        icon.className = "icon-error";
+        const text = document.createElement("span");
+        inputError.appendChild(icon);
+        inputError.appendChild(text);
+        return inputError
     }
 
     createDataSetObject(query, attribute) {
@@ -102,36 +113,30 @@ export class View {
     }
 
     // TODO: does this accept model data?
-    setInputErrors(color, display) {
-        this.inputBorders.forEach((inputBorder) => {
-            inputBorder.style.setProperty("--input-border-color", color);
-        });
-        this.inputErrors.forEach((inputError) => {
-            inputError.style.display = display;
-        });
+    showInputError(form) {
+        const inputBorder = this.inputBorders[form];
+        inputBorder.style.setProperty("--input-border-color", COLORS.HIGHLIGHT.SECONDARY);
+        this.inputError.children[1].innerHTML = this.model[form].error;
+        inputBorder.after(this.inputError);
     }
 
     // TODO: does this accept model data?
-    showInputErrors() {
-        this.setInputErrors(COLORS.HIGHLIGHT.SECONDARY, '');
-    }
-
-    // TODO: does this accept model data?
-    hideInputErrors() {
-        this.setInputErrors('', 'none');
+    hideInputError(form) {
+        const inputBorder = this.inputBorders[form];
+        inputBorder.style.setProperty("--input-border-color", '');
+        this.inputError.remove();
     }
 
 
     /*................HOME................*/
 
     setUserName() {
-        this.userNameInput.value = this.model.username;
+        this.userNameInput.value = this.model.user.name;
         this.setUserNameWidth();
     }
 
     setUserNameWidth() {
         this.userNameInput.style.width = `${this.userNameInput.value.length}ch`;
-        this.hideInputErrors();
     }
 
     selectTimedMode() {
@@ -209,9 +214,8 @@ export class View {
     }
 
     setLetters() {
-        this.model.selectionState.cells.forEach((cell, i) => {
-            this.cells[i].firstElementChild.textContent = cell.letter;
-        });
+        for (const [letter, cell] of zip(this.letters, this.model.selectionState.cells))
+            letter.textContent = cell.letter
     }
 
     resetLetterPathAndSelectedCells() {
@@ -233,9 +237,9 @@ export class View {
     }
 
     setCellColor(index, color) {
-        const cell = this.cells[index];
-        cell.firstElementChild.style.borderColor = color;
-        cell.style.color = color;
+        const letter = this.letters[index];
+        letter.style.borderColor = color;
+        letter.style.color = color;
     }
 
 
@@ -243,7 +247,7 @@ export class View {
 
     updateGameRecap() {
         const { game, words } = this.model.gameState;
-        this.finalScore.textContent =  game.score;
+        this.finalScore.textContent = game.score;
         this.longestWord.textContent = words.longest;
     }
 }

@@ -192,9 +192,9 @@ input:focus~.input-border:before {
 
 }
 
-input:not(:focus)~.input-error {
+/* input:not(:focus)~.input-error {
     display: none;
-}
+} */
 
 .input-error i {
     width: calc(2 * var(--base-unit));
@@ -355,7 +355,7 @@ input:not(:focus)~.input-error {
     z-index: 1;
     width: 90%;
     height: 90%;
-    border-radius: 45%;
+    border-radius: 50%;
 }
 
 #nav-controls {

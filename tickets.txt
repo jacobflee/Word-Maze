@@ -1,6 +1,3 @@
-check for other examples if using the dom as a state (like with gameboard)
-
-
 there is currently a lot of model logic and view logic and occuring in the Presenter
     like with specifying the button and mode (view)
     or with the switch statement for the mode (model)

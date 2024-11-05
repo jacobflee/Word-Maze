@@ -55,12 +55,11 @@ class Database:
                     },
                 )
                 return {
-                    'success': True,
                     'user_id': cur.lastrowid,
                 }
             except sqlite3.IntegrityError:
                 return {
-                    'success': False,
+                    'error': 'username is already taken',
                 }
             
 
@@ -68,20 +67,22 @@ class Database:
     
     def update_user_name(self, user_id, user_name):
         with self.get_cur() as cur:
-            cur.execute(
-                """
-                UPDATE users
-                SET user_name = :user_name
-                WHERE user_id = :user_id
-                """,
-                {
-                    'user_id': user_id,
-                    'user_name': user_name,
+            try:
+                cur.execute(
+                    """
+                    UPDATE users
+                    SET user_name = :user_name
+                    WHERE user_id = :user_id
+                    """,
+                    {
+                        'user_id': user_id,
+                        'user_name': user_name,
+                    }
+                )
+            except sqlite3.IntegrityError:
+                return {
+                    'error': 'username is already taken',
                 }
-            )
-            return {
-                'success': True,
-            }
             
     
     def update_online_status(self, user_id, online_status):
@@ -97,9 +98,6 @@ class Database:
                     'online_status': online_status,
                 }
             )
-            return {
-                'success': True,
-            }
     
 
     def update_friend_match_query(self, user_id, friend_match_query):
@@ -115,9 +113,6 @@ class Database:
                     'friend_match_query': friend_match_query,
                 }
             )
-            return {
-                'success': True,
-            }
 
 
     def update_random_match_query(self, user_id, random_match_query):
@@ -133,9 +128,6 @@ class Database:
                     'random_match_query': random_match_query,
                 }
             )
-            return {
-                'success': True,
-            }
             
 
     #................READ................#
@@ -155,10 +147,9 @@ class Database:
             user_id = cur.fetchone()
             if user_id:
                 return {
-                    'success': True,
                     'user_id': user_id[0],
                 }
             else:
                 return {
-                    'success': False,
+                    'error': 'username not found',
                 }

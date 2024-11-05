@@ -33,12 +33,9 @@
             </details>
             <form id="user-name-form">
                 <div class="input-wrapper">
-                    <input type="text" id="user-name" name="user-name" placeholder="create username" autocomplete="off">
-                    <span class="input-border"></span>
-                    <div class="input-error">
-                        <i class="icon-error"></i>
-                        <span>username unavailable</span>
-                    </div>
+                    <input type="text" id="user-name" name="user-name" placeholder="create username" autocomplete="off"
+                        pattern="^\S.*\S$|^\S$" required />
+                    <span class="input-border" data-form="user"></span>
                 </div>
             </form>
         </header>
@@ -70,8 +67,9 @@
         </header>
         <form id="search-form">
             <div class="input-wrapper from-side">
-                <input type="text" name="user-name" placeholder="add a friend..." autocomplete="off" />
-                <span class="input-border"></span>
+                <input type="text" name="user-name" placeholder="add a friend..." autocomplete="off"
+                    pattern="^\S.*\S$|^\S$" required />
+                <span class="input-border" data-form="friend"></span>
             </div>
         </form>
 

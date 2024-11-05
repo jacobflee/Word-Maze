@@ -5,8 +5,7 @@ export function secondsToMSS(seconds) {
 }
 
 export function easeOutExponential(t) {
-    return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-    // TODO: change to a bezier curve
+    return 1 - (1 - t) * Math.pow(0.01, t);
 }
 
 export function smoothStep(t) {
@@ -21,4 +20,9 @@ export function addEventListeners(elements, events, handler) {
             element.addEventListener(event, handler);
         });
     });
+}
+
+export function* zip(...arrays) {
+    const length = Math.min(...arrays.map(x => x.length));
+    for (let i = 0; i < length; i++) yield arrays.map(array => array[i]);
 }

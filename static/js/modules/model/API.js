@@ -1,4 +1,9 @@
 export class API {
+    constructor(model) {
+        this.model = model;
+    }
+
+
     /*................CREATE................*/
 
     async createNewUser(userName) {
@@ -17,20 +22,22 @@ export class API {
 
     /*................UPATE................*/
 
-    async updateUserName(userId, userName) {
-            const url = '/update_user_name';
-            const params = {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, userName }),
-            };
-            const response = await fetch(url, params);
-            if (!response.ok) console.error(response);
-            const data = await response.json();
-            return data;
+    async updateUserName(userName) {
+        const userId = this.model.user.id;
+        const url = '/update_user_name';
+        const params = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, userName }),
+        };
+        const response = await fetch(url, params);
+        if (!response.ok) console.error(response);
+        const data = await response.json();
+        return data;
     }
 
-    async updateOnlineStatus(userId, onlineStatus) {
+    async updateOnlineStatus(onlineStatus) {
+        const userId = this.model.user.id;
         const url = '/update_online_status';
         const params = {
             method: 'POST',
@@ -43,7 +50,8 @@ export class API {
         return data;
     }
 
-    async updateRandomMatchQuery(userId, randomMatchQuery) {
+    async updateRandomMatchQuery(randomMatchQuery) {
+        const userId = this.model.user.id;
         const url = '/update_random_search_query';
         const params = {
             method: 'POST',
@@ -56,7 +64,8 @@ export class API {
         return data;
     }
 
-    async updateFriendMatchQuery(userId, friendMatchQuery) {
+    async updateFriendMatchQuery(friendMatchQuery) {
+        const userId = this.model.user.id;
         const url = '/update_friend_search_query';
         const params = {
             method: 'POST',
