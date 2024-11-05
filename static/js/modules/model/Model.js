@@ -8,6 +8,12 @@ export class Model {
         this.api = new API();
         this.gameState = new GameState();
         this.selectionState = new SelectionState();
+
+        this.loading = false;
+        this.screen = 'home';
+        this.mode = '';
+        this.username = localStorage.getItem('userName');
+        this.userId = localStorage.getItem('userId');
     }
 
     
@@ -17,17 +23,16 @@ export class Model {
         this.loading = value;
     }
 
-    reset() {
-        this.selectionState.reset();
+    updateCurrentScreen(screen) {
+        this.screen = screen;
+    }
 
+    setMode(mode) {
+        this.mode = mode;
     }
 
 
     /*................HOME................*/
-
-    getUserName() {
-        return localStorage.getItem('userName');
-    }
 
     async setUserName(userName) {
         const user_id = await this.api.createNewUser(userName);
@@ -38,7 +43,7 @@ export class Model {
         // this.userNameValid = false;
     }
 
-    async getGameBoard() {
+    async initializeGameData() {
         const { board, words } = await this.api.fetchNewGameData();
         this.gameState.updateValidWords(words);
         this.selectionState.updateBoard(board);

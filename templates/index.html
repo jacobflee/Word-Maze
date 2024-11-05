@@ -25,7 +25,7 @@
 <body>
     <!--................HOME................-->
 
-    <main id="home-screen" class="screen">
+    <main class="screen" data-screen="home">
         <header>
             <details>
                 <summary id="game-name">Word Maze</summary>
@@ -42,19 +42,19 @@
                 </div>
             </form>
         </header>
-        <button class="mode-select-btn" data-mode="Timed">
+        <button class="mode-btn" data-mode="timed">
             <i class="icon-clock"></i>
             <span>Timed</span>
         </button>
-        <button class="mode-select-btn" data-mode="Free Play">
+        <button class="mode-btn" data-mode="free">
             <i class="icon-circle"></i>
             <span>Free Play</span>
         </button>
-        <button class="mode-select-btn" data-mode="VS Friend">
+        <button class="mode-btn" data-mode="friend">
             <i class="icon-friends"></i>
             <span>VS Friend</span>
         </button>
-        <button class="mode-select-btn" data-mode="VS Random">
+        <button class="mode-btn" data-mode="random">
             <i class="icon-random"></i>
             <span>VS Random</span>
         </button>
@@ -62,7 +62,7 @@
 
     <!--................FRIEND................-->
 
-    <section id="friend-screen" class="screen">
+    <section class="screen" data-screen="friend">
         <header>
             <button class="home-btn">
                 <i class="icon-home"></i>
@@ -81,7 +81,7 @@
 
     <!--................GAME................-->
 
-    <section id="game-screen" class="screen">
+    <section class="screen" data-screen="game">
         <svg id="letter-path"></svg>
         <header>
             <div id="nav-controls">
@@ -97,7 +97,7 @@
         </header>
         <span id="current-score"></span>
         <span id="selected-letters">&nbsp;</span>
-        <div id="game-board">
+        <div id="board">
             <div class="cell" data-index="0" style="grid-area: 1 / 1;">
                 <span class="letter"></span>
                 <div class="touch-target"></div>
@@ -168,7 +168,7 @@
 
     <!--................RESULTS................-->
 
-    <section id="results-screen" class="screen">
+    <section class="screen" data-screen="results">
         <header>
             <button class="home-btn">
                 <i class="icon-home"></i>

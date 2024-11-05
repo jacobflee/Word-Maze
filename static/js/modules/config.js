@@ -1,4 +1,5 @@
 export const COLORS = {
+    // TODO: make it COLORS.CELL.XXX among other more specific sub categories
     DUPLICATE: '#DCDC28',
     VALID: '#14B428',
     SELECTED: '#2850F0',

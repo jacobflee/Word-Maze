@@ -12,22 +12,23 @@ export class Animations {
 
     cellSelection(cell, frame = 1) {
         const frames = TIMING.ANIMATION.CELL_SELECTION;
-        if (frame > frames) {
-            this.view.updateCellStyle(cell, '', '', '');
-        } else {
-            const progress = frame / frames;
-            this.view.updateCellStyle(cell, `${93 + 7 * progress}%`, `${40 - 15 * progress}%`, `calc(${11.5 + 2 * progress} * var(--base-unit))`);
-            requestAnimationFrame(() => this.cellSelection(cell, frame + 1));
-        }
+        if (frame > frames) return;
+        const progress = frame / frames;
+        cell.style.width = `${93 + 7 * progress}%`;
+        cell.style.height = cell.style.width;
+        cell.style.borderRadius = `${40 - 15 * progress}%`;
+        cell.style.fontSize = `calc(${11.5 + 2 * progress} * var(--base-unit))`;
+        requestAnimationFrame(() => this.cellSelection(cell, frame + 1));
     }
 
     wordFadeOut(frame = 1) {
         const frames = TIMING.ANIMATION.WORD_FADE_OUT;
         if (frame > frames) {
-            this.view.resetSelectedLetters();
+            this.view.selectedLetters.innerHTML = '&nbsp;';
+            this.view.selectedLetters.style.cssText = '';
         } else {
             const progress = frame / frames;
-            this.view.setSelectedLettersOpacity(1 - progress);
+            this.view.selectedLetters.style.opacity = 1 - progress;
             requestAnimationFrame(() => this.wordFadeOut(frame + 1));
         }
     }
@@ -36,7 +37,7 @@ export class Animations {
         const frames = TIMING.ANIMATION.SCORE_INCREASE;
         if (frame > frames) return;
         const progress = smoothStep(frame / frames);
-        this.view.setCurrentScore(score + Math.round(points * progress));
+        this.view.currentScore.textContent = score + Math.round(points * progress);
         requestAnimationFrame(() => this.scoreIncrease(score, points, frame + 1));
     }
 
@@ -44,15 +45,24 @@ export class Animations {
     /*................................RESULTS................................*/
 
     barGraph(words, frame = 1) {
+        if (words.count === 0) {
+            this.view.chartBars.forEach((chartBar) => this.updateChartBar(chartBar, '0%', '0'));
+            return;
+        }
         const frames = TIMING.ANIMATION.BAR_GRAPH;
         if (frame > frames) return;
         const progress = easeOutExponential(frame / frames);
-        for (let i = 0; i < 13; i++) {
+        this.view.chartBars.forEach((chartBar, i) => {
             const wordLengthCount = words.length[i + 3];
             const width = `${100 * progress * wordLengthCount / words.count}%`;
             const count = Math.round(progress * wordLengthCount);
-            this.view.updateChartBar(i, width, count);
-        }
+            this.updateChartBar(chartBar, width, count);
+        });
         requestAnimationFrame(() => this.barGraph(words, frame + 1));
+    }
+
+    updateChartBar(chartBar, width, count) {
+        chartBar.children[1].style.width = width;
+        chartBar.children[2].textContent = count;
     }
 }

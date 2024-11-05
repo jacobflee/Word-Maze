@@ -51,6 +51,10 @@ input {
     outline: 0;
 }
 
+main {
+    gap: calc(8 * var(--base-unit)) !important;
+}
+
 .screen {
     width: var(--app-width);
     display: flex;
@@ -218,7 +222,7 @@ input:not(:focus)~.input-error {
     }
 }
 
-.loader::after {
+.loading::after {
     content: "loading.\00a0\00a0";
     animation: loading 1s infinite;
 }
@@ -244,10 +248,6 @@ input:not(:focus)~.input-error {
 
 /*................HOME................*/
 
-#home-screen {
-    gap: calc(8 * var(--base-unit));
-}
-
 #game-name {
     font-size: calc(7 * var(--base-unit));
     font-weight: 700;
@@ -266,7 +266,7 @@ input:not(:focus)~.input-error {
     color: var(--secondary-text-color);
 }
 
-.mode-select-btn {
+.mode-btn {
     height: calc(16 * var(--base-unit));
     border: 0;
     background: linear-gradient(to right, var(--secondary-background-color), var(--primary-background-color));
@@ -275,7 +275,7 @@ input:not(:focus)~.input-error {
     font-size: calc(4.5 * var(--base-unit));
 }
 
-.mode-select-btn i {
+.mode-btn i {
     position: absolute;
     left: 0;
     top: calc(5 * var(--base-unit));
@@ -321,7 +321,7 @@ input:not(:focus)~.input-error {
     border-radius: calc(2 * var(--base-unit));
 }
 
-#game-board {
+#board {
     width: var(--app-width);
     height: var(--app-width);
     touch-action: none;

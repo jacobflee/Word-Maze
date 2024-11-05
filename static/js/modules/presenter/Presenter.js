@@ -1,80 +1,76 @@
-import { Animations } from "./Animations.js"
+import { Model } from '../model/Model.js'
+import { View } from '../view/View.js'
+import { Board } from './Board.js'
+import { addEventListeners } from '../utils.js'
 
 
 export class Presenter {
-    constructor(model, view) {
-        this.model = model;
-        this.view = view;
-        this.animations = new Animations(view);
+    constructor() {
+        this.model = new Model();
+        this.view = new View(this.model);
+        this.board = new Board(this.model, this.view);
         this.initializeEventHandlers();
-        this.setUserName();
     }
 
     initializeEventHandlers() {
-        // RESIZE
-        window.addEventListener('resize', () => this.view.setAppHeight());
+        // WINDOW
+        window.addEventListener(
+            'resize',
+            () => this.view.setAppHeight()
+        );
 
-        // HOME
-        this.addEventListeners(
+        // BUTTONS
+        addEventListeners(
             this.view.homeBtns,
             'click',
-            () => this.view.switchToHomeScreen()
+            () => this.switchScreen('home') // TODO: repaints uneccessary screens
+        );
+        addEventListeners(
+            Object.entries(this.view.modeBtns).map(([_, element]) => element),
+            'click',
+            (event) => this.startMode(event) // TODO: implement compatibility with multiplayer
+        );
+        this.view.resultsBtn.addEventListener(
+            'click',
+            () => this.displayResults()
         );
 
-        // USERNAME
-        this.view.userNameInput.addEventListener('input', () => this.view.setUserNameWidth());
-        this.view.userNameForm.addEventListener('submit', (event) => this.updateUserName(event));
-        this.addEventListeners(
+        // INPUTS
+        this.view.userNameInput.addEventListener(
+            'input',
+            () => this.view.setUserNameWidth() // TODO: repaints uneccessary errors
+        );
+        this.view.userNameForm.addEventListener(
+            'submit',
+            (event) => this.updateUserName(event) // TODO: implement
+        );
+        this.view.searchForm.addEventListener(
+            'submit',
+            (event) => this.searchFriend(event) // TODO: implement
+        );
+        addEventListeners(
             window,
             ['touchend', 'mouseup'],
-            () => this.hideInputErrors()
+            () => this.hideInputErrors() // TODO: repaints uneccessary errors
         );
 
-        // MODES
-        this.addEventListeners(
-            this.view.modeSelectBtns,
-            'click',
-            (event) => this.startMode(event)
-        );
-
-        // FRIEND
-        this.view.searchForm.addEventListener('submit', (event) => this.searchFriend(event));
-
-        // GAME
-        this.addEventListeners(
+        // CELLS
+        addEventListeners(
             this.view.touchTargets,
             ['mousedown', 'mousemove', 'touchstart', 'touchmove'],
-            (event) => this.handleCellInteraction(event)
+            (event) => this.board.handleCellInteraction(event)
         );
-        this.addEventListeners(
+        addEventListeners(
             window,
             ['touchcancel', 'touchend', 'mouseup'],
-            () => this.endSelection()
+            () => this.board.endSelection()
         );
-
-        // RESULTS
-        this.view.resultsBtn.addEventListener('click', () => this.displayResults());
-    }
-
-    addEventListeners(elements, events, handler) {
-        if (!elements.forEach) elements = [elements];
-        if (!events.forEach) events = [events];
-        elements.forEach((element) => {
-            events.forEach((event) => {
-                element.addEventListener(event, handler);
-            });
-        });
     }
 
 
     /*................HOME................*/
 
-    setUserName() {
-        const userName = this.model.getUserName();
-        this.view.setUserName(userName);
-    }
-
-    async updateUserName(event) {
+    async updateUserName(event) { // TODO: implement
         event.preventDefault();
         const userName = event.currentTarget.userName.value;
         await this.model.setUserName(userName);
@@ -87,48 +83,54 @@ export class Presenter {
     }
 
     hideInputErrors() {
-        this.view.hideInputErrors();
+        this.view.hideInputErrors(); // TODO: hides uneccessary errors
     }
 
-    // TODO: do some sort of spooling animation when waiting for game data
-    async startMode(event) {
+    async startMode(event) { // TODO: implement
         if (this.model.loading) return;
         this.model.setLoading(true);
-        const button = event.currentTarget;
-        this.view.setButtonAsLoading(button);
+        this.model.setMode(event.currentTarget.dataset.mode);
+        this.view.setButtonAsLoading();
         this.model.gameState.reset();
-        switch (button.dataset.mode) {
-            case 'Timed':
+        switch (this.model.mode) {
+            case 'timed':
                 await this.initializeGameData();
                 this.view.selectTimedMode();
                 this.startTimer();
                 break;
-            case 'Free Play':
+            case 'free':
                 await this.initializeGameData();
                 this.view.selectFreePlayMode();
                 break;
-            case 'VS Friend':
-                if (this.model.getUserName() === '') {
+            case 'friend':
+                if (this.model.username === '') {
                     this.view.userNameInput.focus();
                 } else {
-                    this.view.selectVSFriendMode();
+                    this.switchScreen('friend');
                 }
                 break;
-            case 'VS Random':
-                if (this.model.getUserName() === '') {
+            case 'random':
+                if (this.model.username === '') {
                     this.view.userNameInput.focus();
                 } else {
                     this.view.selectVSRandomMode();
                 }
                 break;
         }
-        this.view.resetButton(button);
+        this.switchScreen('game');
+        this.view.resetButton();
         this.model.setLoading(false);
     }
 
+    switchScreen(screen) {
+        this.view.updateScreenDisplay('none');
+        this.model.updateCurrentScreen(screen);
+        this.view.updateScreenDisplay('');
+    }
+
     async initializeGameData() {
-        await this.model.getGameBoard();
-        this.model.selectionState.board.forEach((cell, i) => this.view.setLetterText(cell.letter, i));
+        await this.model.initializeGameData();
+        this.view.setLetters();
     }
 
 
@@ -149,74 +151,8 @@ export class Presenter {
     }
 
     updateTimer() {
-        const { text, color, seconds } = this.model.gameState.time;
-        this.view.updateTimer(text, color);
-        if (seconds === 0) this.displayResults();
-    }
-
-    handleCellInteraction(event) {
-        const start = ['mousedown', 'touchstart'].includes(event.type);
-        if (start) this.model.selectionState.start();
-        const selecting = this.model.selectionState.selecting;
-        if (!selecting) return;
-        if (event.type === 'touchmove') {
-            var touchTarget = this.view.getElementAtTouchPoint(event.touches[0]);
-            if (touchTarget?.className !== 'touch-target') return;
-        } else
-            var touchTarget = event.currentTarget;
-        const targetCell = touchTarget.parentElement;
-        const index = targetCell.dataset.index;
-        this.model.selectionState.updateTargetCell(targetCell, index);
-        if (!this.model.selectionState.cell.valid) return;
-        this.animations.cellSelection(this.model.selectionState.cell.current.element.firstElementChild);
-        this.drawPath();
-        this.model.addSelectedCell();
-        const word = this.model.selectionState.word;
-        const path = this.model.selectionState.path;
-        const cell = this.model.selectionState.cell.current;
-        this.view.updateSelectedLetters(word, path, cell);
-    }
-
-    drawPath() {
-        this.drawSelectionCircle();
-        if (this.model.selectionState.cell.previous.row) this.drawConnectionLine();
-    }
-
-    drawSelectionCircle() {
-        const current = this.model.selectionState.cell.current;
-        const [cx, cy] = this.getCellCenter(current.element);
-        const r = current.element.clientWidth / 14.5;
-        this.view.createSelectionCircle(cx, cy, r);
-    }
-
-    drawConnectionLine() {
-        const { current, previous } = this.model.selectionState.cell;
-        const strokeWidth = current.element.clientWidth / 6.5;
-        const [x1, y1] = this.getCellCenter(previous.element);
-        const [x2, y2] = this.getCellCenter(current.element);
-        this.view.createConnectionLine(strokeWidth, x1, y1, x2, y2);
-    }
-
-    getCellCenter(element) {
-        const x = element.offsetLeft + element.clientWidth / 2;
-        const y = element.offsetTop + element.clientHeight / 2;
-        return [x, y];
-    }
-
-    endSelection() {
-        const selecting = this.model.selectionState.selecting;
-        if (!selecting) return;
-        const word = this.model.selectionState.word;
-        const path = this.model.selectionState.path;
-        if (word.valid && !word.found) {
-            const { game, words } = this.model.gameState;
-            this.animations.scoreIncrease(game.score, word.points);
-            this.model.addFoundWord();
-            this.view.updateWordCount(words.count);
-        }
-        this.animations.wordFadeOut();
-        this.view.resetLetterPathAndSelectedCells(path.elements);
-        this.model.reset();
+        this.view.updateTimer();
+        if (this.model.gameState.time.seconds === 0) this.displayResults();
     }
 
 
@@ -224,10 +160,8 @@ export class Presenter {
 
     displayResults() {
         const { game, words } = this.model.gameState;
-        this.view.displayResults(game.score, words.longest);
-        if (words.count === 0)
-            for (let i = 0; i < 13; i++) this.view.updateChartBar(i, '0%', '0');
-        else
-            this.animations.barGraph(words);
+        this.view.updateGameRecap(game.score, words.longest);
+        this.switchScreen('results');
+        this.view.animations.barGraph(words);
     }
 }

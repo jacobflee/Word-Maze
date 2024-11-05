@@ -8,6 +8,9 @@ export class GameState {
     }
 
     reset() {
+        this.game = {
+            score: 0,
+        }
         this.words = {
             count: 0,
             longest: '',
@@ -21,18 +24,14 @@ export class GameState {
             content: '',
             seconds: TIMING.GAME_DURATION,
         };
-        this.game = {
-            score: 0,
-        }
     }
 
     createObject(length, key, value) {
         return Object.fromEntries(
-            Array.from(
-                { length },
+            Array.from({ length },
                 (_, i) => [key(i), value(i)]
             )
-        )
+        );
     }
 
     startTimer(updateTimer) {

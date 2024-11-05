@@ -1,14 +1,18 @@
 import { COLORS } from '../config.js';
+import { Animations } from "./Animations.js"
 
 
 export class View {
-    constructor() {
+    constructor(model) {
+        this.model = model;
+        this.animations = new Animations(this);
         this.setAppHeight();
         this.setColorConfigs();
         this.setDOMReferences();
-        this.hideInputErrors();
-        this.createSpooler();
-        this.switchToHomeScreen();
+        this.setUserName();
+        this.initializeScreens();
+
+        this.hideInputErrors(); // TODO: something fishy here
     }
 
 
@@ -32,20 +36,17 @@ export class View {
     }
 
     setDOMReferences() {
-        this.screens = document.querySelectorAll('.screen');
         this.homeBtns = document.querySelectorAll('.home-btn');
         this.inputBorders = document.querySelectorAll('.input-border');
         this.inputErrors = document.querySelectorAll('.input-error');
 
-        this.homeScreen = document.getElementById('home-screen');
         this.userNameForm = document.getElementById('user-name-form');
         this.userNameInput = document.getElementById('user-name');
-        this.modeSelectBtns = document.querySelectorAll('.mode-select-btn');
 
-        this.friendScreen = document.getElementById('friend-screen');
+        this.modeBtns =  this.createDataSetObject('.mode-btn', 'mode');
+
         this.searchForm = document.getElementById('search-form');
 
-        this.gameScreen = document.getElementById('game-screen');
         this.letterPath = document.getElementById('letter-path');
         this.navControls = document.getElementById('nav-controls');
         this.resultsBtn = document.getElementById('results-btn');
@@ -53,29 +54,43 @@ export class View {
         this.wordCounter = document.getElementById('word-counter');
         this.currentScore = document.getElementById('current-score');
         this.selectedLetters = document.getElementById('selected-letters');
-        this.gameBoard = document.getElementById('game-board');
-        this.letters = document.querySelectorAll('.letter');
+
+        this.cells = document.querySelectorAll('.cell');
         this.touchTargets = document.querySelectorAll('.touch-target');
 
-        this.resultsScreen = document.getElementById('results-screen');
         this.finalScore = document.getElementById('final-score');
         this.longestWord = document.getElementById('longest-word');
-        this.barFills = document.querySelectorAll('.bar-fill');
-        this.barCounts = document.querySelectorAll('.bar-count');
+        this.chartBars = document.querySelectorAll('.chart-bar');
+
+        this.screens = this.createDataSetObject('.screen', 'screen');
+
+        this.spooler = this.createSpooler();
+    }
+
+    createDataSetObject(query, attribute) {
+        return Object.fromEntries(
+            Array.from(document.querySelectorAll(query)).map(
+                (element) => [element.dataset[attribute], element]
+            )
+        );
+    }
+
+    initializeScreens() {
+        Object.entries(this.screens).map(([screen, element]) => {
+            if (screen !== this.model.screen) element.style.display = 'none';
+        });
+    }
+
+    updateScreenDisplay(display) {
+        this.screens[this.model.screen].style.display = display;
     }
 
     createSpooler() {
-        this.spooler = document.createElement("i");
-        this.spooler.className = "icon-spooler";
-    }
-
-    switchScreen(screen) {
-        this.screens.forEach((screen) => screen.style.display = 'none');
-        screen.style.display = '';
-    }
-
-    switchToHomeScreen() {
-        this.switchScreen(this.homeScreen);
+        const icon = document.createElement("i");
+        icon.className = "icon-spooler";
+        const text = document.createElement("span");
+        text.className = "loading";
+        return { icon, text };
     }
 
     blurActiveElement() {
@@ -86,6 +101,7 @@ export class View {
         return document.elementFromPoint(touch.clientX, touch.clientY);
     }
 
+    // TODO: does this accept model data?
     setInputErrors(color, display) {
         this.inputBorders.forEach((inputBorder) => {
             inputBorder.style.setProperty("--input-border-color", color);
@@ -95,19 +111,21 @@ export class View {
         });
     }
 
+    // TODO: does this accept model data?
     showInputErrors() {
         this.setInputErrors(COLORS.HIGHLIGHT.SECONDARY, '');
     }
 
+    // TODO: does this accept model data?
     hideInputErrors() {
         this.setInputErrors('', 'none');
     }
-    
+
 
     /*................HOME................*/
 
-    setUserName(userName) {
-        this.userNameInput.value = userName;
+    setUserName() {
+        this.userNameInput.value = this.model.username;
         this.setUserNameWidth();
     }
 
@@ -129,7 +147,7 @@ export class View {
     }
 
     selectVSFriendMode() {
-        this.switchScreen(this.friendScreen);
+        // implement
     }
 
     selectVSRandomMode() {
@@ -138,39 +156,34 @@ export class View {
 
     startMode() {
         this.updateWordCount(0);
-        this.setCurrentScore(0);
-        this.switchScreen(this.gameScreen);
+        this.currentScore.textContent = 0;
     }
 
-    setButtonAsLoading(button) {
-        const [icon, text] = button.children;
-        button.insertBefore(this.spooler, icon);
-        icon.style.display = 'none';
-        text.textContent = '';
-        text.className = 'loader';
+    setButtonAsLoading() {
+        const modeBtn = this.modeBtns[this.model.mode];
+        modeBtn.children[0].style.display = 'none';
+        modeBtn.children[1].style.display = 'none';
+        const fragment = document.createDocumentFragment();
+        fragment.appendChild(this.spooler.icon);
+        fragment.appendChild(this.spooler.text);
+        modeBtn.appendChild(fragment);
     }
 
-    resetButton(button) {
-        button.removeChild(this.spooler);
-        const [icon, text] = button.children;
-        icon.style.display = '';
-        text.className = '';
-        text.textContent = button.dataset.mode;
+    resetButton() {
+        const modeBtn = this.modeBtns[this.model.mode];
+        modeBtn.removeChild(this.spooler.icon);
+        modeBtn.removeChild(this.spooler.text);
+        modeBtn.children[0].style.display = '';
+        modeBtn.children[1].style.display = '';
     }
 
 
     /*................GAME................*/
 
-    updateTimer(timeString, color) {
-        this.countdownTimer.textContent = timeString;
-        this.countdownTimer.style.color = color;
-    }
-
-    updateCellStyle(cell, side, radius, fontSize) {
-        cell.style.width = side;
-        cell.style.height = side;
-        cell.style.borderRadius = radius;
-        cell.style.fontSize = fontSize;
+    updateTimer() {
+        const time = this.model.gameState.time;
+        this.countdownTimer.textContent = time.text;
+        this.countdownTimer.style.color = time.color;
     }
 
     createSelectionCircle(cx, cy, r) {
@@ -191,43 +204,36 @@ export class View {
         this.letterPath.appendChild(line);
     }
 
-    updateWordCount(wordCount) {
-        this.wordCounter.textContent = `Words: ${wordCount}`;
+    updateWordCount() {
+        this.wordCounter.textContent = `Words: ${this.model.gameState.words.count}`;
     }
 
-    setCurrentScore(score) {
-        this.currentScore.textContent = score;
+    setLetters() {
+        this.model.selectionState.cells.forEach((cell, i) => {
+            this.cells[i].firstElementChild.textContent = cell.letter;
+        });
     }
 
-    resetSelectedLetters() {
-        this.selectedLetters.innerHTML = '&nbsp;';
-        this.selectedLetters.style.cssText = '';
-    }
-
-    setSelectedLettersOpacity(opacity) {
-        this.selectedLetters.style.opacity = opacity;
-    }
-
-    setLetterText(letter, i) {
-        this.letters[i].textContent = letter;
-    }
-
-    resetLetterPathAndSelectedCells(selectedCells) {
+    resetLetterPathAndSelectedCells() {
         this.letterPath.innerHTML = '';
-        selectedCells.forEach((cell) => this.setCellColor(cell, ''));
+        this.model.selectionState.path.indices.forEach(
+            (index) => this.setCellColor(index, '')
+        );
     }
 
-    updateSelectedLetters(word, path, cell) {
-        this.selectedLetters.textContent = word.content;
-        this.selectedLetters.style.backgroundColor = word.background;
+    updateSelectedLetters() {
+        const { word, path, cell } = this.model.selectionState;
+        this.selectedLetters.textContent = word.textContent;
+        this.selectedLetters.style.backgroundColor = word.backgroundColor;
         this.selectedLetters.style.color = word.color;
-        this.selectedLetters.style.fontWeight = word.weight;
+        this.selectedLetters.style.fontWeight = word.fontWeight;
         this.letterPath.style.fill = path.color;
         this.letterPath.style.stroke = path.color;
-        path.targets.forEach((target) => this.setCellColor(target, cell.color));
+        path.targets.forEach((index) => this.setCellColor(index, cell.current.data.color));
     }
 
-    setCellColor(cell, color) {
+    setCellColor(index, color) {
+        const cell = this.cells[index];
         cell.firstElementChild.style.borderColor = color;
         cell.style.color = color;
     }
@@ -235,14 +241,9 @@ export class View {
 
     /*................RESULTS................*/
 
-    displayResults(currentScore, longestWord) {
-        this.finalScore.textContent = currentScore;
-        this.longestWord.textContent = longestWord;
-        this.switchScreen(this.resultsScreen);
-    }
-
-    updateChartBar(i, width, count) {
-        this.barFills[i].style.width = width;
-        this.barCounts[i].textContent = count;
+    updateGameRecap() {
+        const { game, words } = this.model.gameState;
+        this.finalScore.textContent =  game.score;
+        this.longestWord.textContent = words.longest;
     }
 }
