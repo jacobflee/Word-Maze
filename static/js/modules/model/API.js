@@ -14,9 +14,11 @@ export class API {
             body: JSON.stringify({ userName }),
         };
         const response = await fetch(url, params);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 
 
@@ -31,9 +33,11 @@ export class API {
             body: JSON.stringify({ userId, userName }),
         };
         const response = await fetch(url, params);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 
     async updateOnlineStatus(onlineStatus) {
@@ -45,9 +49,11 @@ export class API {
             body: JSON.stringify({ userId, onlineStatus }),
         };
         const response = await fetch(url, params);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 
     async updateRandomMatchQuery(randomMatchQuery) {
@@ -59,9 +65,11 @@ export class API {
             body: JSON.stringify({ userId, randomMatchQuery }),
         };
         const response = await fetch(url, params);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 
     async updateFriendMatchQuery(friendMatchQuery) {
@@ -73,9 +81,11 @@ export class API {
             body: JSON.stringify({ userId, friendMatchQuery }),
         };
         const response = await fetch(url, params);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 
 
@@ -84,9 +94,11 @@ export class API {
     async fetchNewGameData() {
         const url = '/fetch_new_game_data';
         const response = await fetch(url);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 
     async fetchUserId(userName) {
@@ -97,8 +109,10 @@ export class API {
             body: JSON.stringify({ userName }),
         };
         const response = await fetch(url, params);
-        if (!response.ok) console.error(response);
-        const data = await response.json();
-        return data;
+        if (response.ok) {
+            return await response.json()
+        } else {
+            console.error(response);
+        }
     }
 }

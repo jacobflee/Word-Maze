@@ -1,14 +1,14 @@
 import { Model } from '../model/Model.js'
 import { View } from '../view/View.js'
-import { Board } from './Board.js'
+import { Game } from './Game.js'
 import { addEventListeners } from '../utils.js'
 
 
-export class Presenter {
+export class Controller {
     constructor() {
         this.model = new Model();
         this.view = new View(this.model);
-        this.board = new Board(this.model, this.view);
+        this.game = new Game(this.model, this.view);
         this.initializeEventHandlers();
     }
 
@@ -26,9 +26,9 @@ export class Presenter {
             () => this.switchScreen('home')
         );
         addEventListeners(
-            Object.entries(this.view.modeBtns).map(([_, element]) => element),
+            Object.values(this.view.modeBtns),
             'click',
-            (event) => this.startMode(event) // TODO: implement compatibility with multiplayer
+            (event) => this.startMode(event)
         );
         this.view.resultsBtn.addEventListener(
             'click',
@@ -42,7 +42,7 @@ export class Presenter {
         );
         this.view.searchForm.addEventListener(
             'submit',
-            (event) => this.searchFriend(event) // TODO: implement
+            (event) => this.searchFriend(event)
         );
 
         // INPUTS
@@ -52,100 +52,24 @@ export class Presenter {
         );
         this.view.userNameInput.addEventListener(
             'blur',
-            () => this.handleUserNameInputBlur('user')
+            () => this.handleUserNameBlur()
         );
         this.view.userNameInput.addEventListener(
             'invalid',
-            (event) => this.handleUserNameInputInvalid(event, 'user')
+            (event) => this.handleUserNameInvalid(event, 'user')
         );
         
         // CELLS
         addEventListeners(
             this.view.touchTargets,
             ['mousedown', 'mousemove', 'touchstart', 'touchmove'],
-            (event) => this.board.handleCellInteraction(event)
+            (event) => this.game.handleCellInteraction(event)
         );
         addEventListeners(
             window,
             ['touchcancel', 'touchend', 'mouseup'],
-            () => this.board.endSelection()
+            () => this.game.endSelection()
         );
-    }
-
-
-    /*................HOME................*/
-
-    async updateUserName(event) { // TODO: implement
-        event.preventDefault();
-        const userName = event.currentTarget['user-name'].value;
-        await this.model.setUserName(userName);
-        if (this.model.user.error) {
-            this.view.showInputError('user');
-        } else {
-            this.view.hideInputError('user');
-            this.view.blurActiveElement();
-        }
-    }
-
-    resetInputError(form) {
-        if (!this.model[form].error) return;
-        this.model.resetFormError(form);
-        this.view.hideInputError(form);
-    }
-
-    handleUserNameInputBlur(form) {
-        this.view.setUserName();
-        this.resetInputError(form);
-    }
-
-    handleUserNameInputInvalid(event, form) {
-        event.preventDefault();
-        const error = event.currentTarget.value === ''
-            ? 'username is empty'
-            : 'username has outer spaces';
-        this.model.setFormError(form, error);
-        this.view.showInputError('user');
-    }
-
-    handleUserNameInput() {
-        this.resetInputError('user');
-        this.view.setUserNameWidth();
-    }
-
-    async startMode(event) { // TODO: implement
-        if (this.model.loading) return;
-        this.model.setLoading(true);
-        this.model.setMode(event.currentTarget.dataset.mode);
-        this.view.setButtonAsLoading();
-        this.model.gameState.reset();
-        switch (this.model.mode) {
-            case 'timed':
-                await this.initializeGameData();
-                this.view.selectTimedMode();
-                this.startTimer();
-                break;
-            case 'free':
-                await this.initializeGameData();
-                this.view.selectFreePlayMode();
-                break;
-            case 'friend':
-                if (this.model.user.name === '') {
-                    this.view.userNameInput.focus();
-                } else {
-                    this.switchScreen('friend');
-                }
-                break;
-            case 'random':
-                if (this.model.user.name === '') {
-                    this.view.userNameInput.focus();
-                } else {
-                    this.view.selectVSRandomMode();
-                }
-                break;
-        }
-        this.switchScreen('game');
-        this.view.resetButton();
-        this.model.setLoading(false);
     }
 
     switchScreen(screen) {
@@ -154,9 +78,82 @@ export class Presenter {
         this.view.updateScreenDisplay('');
     }
 
+
+    /*................HOME................*/
+
+    async updateUserName(event) {
+        event.preventDefault();
+        const userName = event.currentTarget['user-name'].value;
+        await this.model.setUserName(userName);
+        if (this.model.user.error) {
+            this.view.showInputError('user');
+        } else {
+            this.view.blurActiveElement();
+        }
+    }
+
+    handleUserNameInvalid(event, form) {
+        event.preventDefault();
+        const userName = event.currentTarget.value;
+        this.model.setFormError(form, userName);
+        this.view.showInputError('user');
+    }
+
+    handleUserNameInput() {
+        this.resetInputError('user');
+        this.view.setUserNameWidth();
+    }
+
+    handleUserNameBlur() {
+        this.resetInputError('user');
+        this.view.setUserName();
+    }
+
+    resetInputError(form) {
+        if (!this.model[form].error) return
+        this.model.setFormError(form, null);
+        this.view.hideInputError(form);
+    }
+
+    async startMode(event) {
+        if (this.model.loading) return
+        this.model.setLoading(true);
+        this.model.setMode(event.currentTarget.dataset.mode);
+        this.view.setButtonAsLoading();
+        this.model.game.reset();
+        switch (this.model.mode) {
+            case 'timed':
+                await this.initializeGameData();
+                this.view.selectTimedMode();
+                this.game.startTimer();
+                break
+            case 'free':
+                await this.initializeGameData();
+                this.view.selectFreePlayMode();
+                break
+            case 'friend':
+                if (this.model.user.name === '') {
+                    this.view.userNameInput.focus();
+                } else {
+                    this.switchScreen('friend');
+                }
+                break
+            case 'random':
+                if (this.model.user.name === '') {
+                    this.view.userNameInput.focus();
+                } else {
+                    this.view.selectVSRandomMode();
+                }
+                break
+        }
+        this.switchScreen('game');
+        this.view.resetButton();
+        this.model.setLoading(false);
+    }
+
     async initializeGameData() {
         await this.model.initializeGameData();
-        this.view.setLetters();
+        this.view.game.setLetters();
     }
 
 
@@ -165,26 +162,13 @@ export class Presenter {
     searchFriend(event) {
         event.preventDefault();
         const userName = event.currentTarget['user-name'].value;
-        // TODO: show either friend card with an add friend button or no friend found
-    }
-
-
-    /*................GAME................*/
-
-    startTimer() {
-        this.model.gameState.startTimer(() => this.updateTimer());
-    }
-
-    updateTimer() {
-        this.view.updateTimer();
-        if (this.model.gameState.time.seconds === 0) this.displayResults();
     }
 
 
     /*................RESULTS................*/
 
     displayResults() {
-        const { game, words } = this.model.gameState;
+        const { game, words } = this.model.game;
         this.view.updateGameRecap(game.score, words.longest);
         this.switchScreen('results');
         this.view.animations.barGraph(words);

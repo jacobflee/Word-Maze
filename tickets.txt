@@ -1,12 +1,10 @@
-there is currently a lot of model logic and view logic and occuring in the Presenter
-    like with specifying the button and mode (view)
-    or with the switch statement for the mode (model)
+implement startMode and friendSearch
 
 
-fix naming (selectedLetters is current word text)
+onconnect and ondisconnect update database that user is online
 
 
-refactor to minimize dom repaints, anytime a style is set in js a repaint is triggered
+create screen to display user stats
 
 
 implement local storage handler
@@ -27,10 +25,13 @@ implement local storage handler
 after each game update local storage user stats
 
 
-create screen to display user stats
+config make COLORS.CELL.XXX among other more specific sub categories
 
 
-create vars for named sizes like font size and width
+fix naming (selectedLetters is current word text)
+
+
+create css vars for named sizes like font size and width
     then have claude write names for isolating sizes
 
 

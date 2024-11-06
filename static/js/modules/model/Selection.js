@@ -1,7 +1,8 @@
 import { COLORS, POINTS } from '../config.js';
+import { pluck } from '../utils.js';
 
 
-export class SelectionState {
+export class Selection {
     constructor() {
         this.cells = Array.from({ length: 16 }, () => ({}));
         this.reset();
@@ -65,11 +66,11 @@ export class SelectionState {
 
     checkCellValidity() {
         const { current, previous } = this.cell;
-        if (current.data.color !== '') return false; // cell is already selected
-        if (!previous.data) return true; // cell is the first selected
+        if (current.data.color !== '') return false // cell is already selected
+        if (!previous.data) return true // cell is the first selected
         const rowDifference = Math.abs(current.data.row - previous.data.row);
         const columnDifferent = Math.abs(current.data.column - previous.data.column);
-        return rowDifference <= 1 && columnDifferent <= 1; // cell is within one space of previous
+        return rowDifference <= 1 && columnDifferent <= 1 // cell is within one space of previous
     }
 
     updateSelectedCell() {
@@ -80,6 +81,7 @@ export class SelectionState {
 
     updateValidatedCell(valid, found) {
         const { word, cell, path, cells } = this;
+        const { current, previous } = cell;
         word.valid = valid;
         word.found = found;
         if (valid) {
@@ -94,23 +96,25 @@ export class SelectionState {
             word.textContent = found
                 ? word.text
                 : `${word.text} (+${points})`;
-            cell.current.data.color = color;
+            current.data.color = color;
             path.color = COLORS.LETTER_PATH_VALID;
         } else {
             word.backgroundColor = '';
             word.color = '';
             word.fontWeight = '';
             word.textContent = word.text;
-            cell.current.data.color = COLORS.SELECTED;
+            current.data.color = COLORS.SELECTED;
             path.color = '';
         }
-        if (cell.previous.data?.color === cell.current.data.color) {
-            path.targets = [cell.current.index];
+        if (previous.data?.color === current.data.color) {
+            path.targets = [current.index];
         } else {
             path.targets = path.indices;
-            path.targets.forEach((index) => cells[index].color = cell.current.data.color);
+            for (const cell of pluck(cells, path.targets)) {
+                cell.color = current.data.color
+            }
         }
-        cell.previous.index = cell.current.index;
-        cell.previous.data = cell.current.data;
+        previous.index = current.index;
+        previous.data = current.data;
     }
 }

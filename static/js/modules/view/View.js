@@ -1,11 +1,12 @@
 import { COLORS } from '../config.js';
 import { Animations } from './Animations.js'
-import { zip } from '../utils.js'
+import { Game } from './Game.js'
 
 
 export class View {
     constructor(model) {
         this.model = model;
+        this.game = new Game(model);
         this.animations = new Animations(this);
         this.setAppHeight();
         this.setColorConfigs();
@@ -13,9 +14,6 @@ export class View {
         this.setUserName();
         this.initializeScreens();
     }
-
-
-    /*................GLOBAL................*/
 
     setAppHeight() {
         document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
@@ -37,14 +35,10 @@ export class View {
     setDOMReferences() {
         this.homeBtns = document.querySelectorAll('.home-btn');
         this.inputBorders = this.createDataSetObject('.input-border', 'form');
-
         this.userNameForm = document.getElementById('user-name-form');
         this.userNameInput = document.getElementById('user-name');
-
         this.modeBtns = this.createDataSetObject('.mode-btn', 'mode');
-
         this.searchForm = document.getElementById('search-form');
-
         this.letterPath = document.getElementById('letter-path');
         this.navControls = document.getElementById('nav-controls');
         this.resultsBtn = document.getElementById('results-btn');
@@ -52,19 +46,22 @@ export class View {
         this.wordCounter = document.getElementById('word-counter');
         this.currentScore = document.getElementById('current-score');
         this.selectedLetters = document.getElementById('selected-letters');
-
         this.cells = document.querySelectorAll('.cell');
         this.letters = document.querySelectorAll('.letter');
         this.touchTargets = document.querySelectorAll('.touch-target');
-
         this.finalScore = document.getElementById('final-score');
         this.longestWord = document.getElementById('longest-word');
-        this.chartBars = document.querySelectorAll('.chart-bar');
-
         this.screens = this.createDataSetObject('.screen', 'screen');
-
         this.spooler = this.createSpooler();
         this.inputError = this.createInputError();
+    }
+
+    createSpooler() {
+        const icon = document.createElement("i");
+        icon.className = "icon-spooler";
+        const text = document.createElement("span");
+        text.className = "loading";
+        return { icon, text }
     }
 
     createInputError() {
@@ -79,29 +76,22 @@ export class View {
     }
 
     createDataSetObject(query, attribute) {
-        return Object.fromEntries(
-            Array.from(document.querySelectorAll(query)).map(
-                (element) => [element.dataset[attribute], element]
-            )
-        );
+        const elements = document.querySelectorAll(query);
+        const map = (element) => [element.dataset[attribute], element];
+        const entries = Array.from(elements, map);
+        return Object.fromEntries(entries)
     }
 
     initializeScreens() {
-        Object.entries(this.screens).map(([screen, element]) => {
-            if (screen !== this.model.screen) element.style.display = 'none';
-        });
+        for (const [screen, element] of Object.entries(this.screens)) {
+            if (screen !== this.model.screen) {
+                element.style.display = 'none';
+            }
+        }
     }
 
     updateScreenDisplay(display) {
         this.screens[this.model.screen].style.display = display;
-    }
-
-    createSpooler() {
-        const icon = document.createElement("i");
-        icon.className = "icon-spooler";
-        const text = document.createElement("span");
-        text.className = "loading";
-        return { icon, text };
     }
 
     blurActiveElement() {
@@ -109,22 +99,7 @@ export class View {
     }
 
     getElementAtTouchPoint(touch) {
-        return document.elementFromPoint(touch.clientX, touch.clientY);
-    }
-
-    // TODO: does this accept model data?
-    showInputError(form) {
-        const inputBorder = this.inputBorders[form];
-        inputBorder.style.setProperty("--input-border-color", COLORS.HIGHLIGHT.SECONDARY);
-        this.inputError.children[1].innerHTML = this.model[form].error;
-        inputBorder.after(this.inputError);
-    }
-
-    // TODO: does this accept model data?
-    hideInputError(form) {
-        const inputBorder = this.inputBorders[form];
-        inputBorder.style.setProperty("--input-border-color", '');
-        this.inputError.remove();
+        return document.elementFromPoint(touch.clientX, touch.clientY)
     }
 
 
@@ -160,7 +135,7 @@ export class View {
     }
 
     startMode() {
-        this.updateWordCount(0);
+        this.game.updateWordCount(0);
         this.currentScore.textContent = 0;
     }
 
@@ -182,71 +157,24 @@ export class View {
         modeBtn.children[1].style.display = '';
     }
 
-
-    /*................GAME................*/
-
-    updateTimer() {
-        const time = this.model.gameState.time;
-        this.countdownTimer.textContent = time.text;
-        this.countdownTimer.style.color = time.color;
+    showInputError(form) {
+        const inputBorder = this.inputBorders[form];
+        inputBorder.style.setProperty("--input-border-color", COLORS.HIGHLIGHT.SECONDARY);
+        this.inputError.children[1].innerHTML = this.model[form].error;
+        inputBorder.after(this.inputError);
     }
 
-    createSelectionCircle(cx, cy, r) {
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', cx);
-        circle.setAttribute('cy', cy);
-        circle.setAttribute('r', r);
-        this.letterPath.appendChild(circle);
-    }
-
-    createConnectionLine(strokeWidth, x1, y1, x2, y2) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('stroke-width', strokeWidth);
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
-        this.letterPath.appendChild(line);
-    }
-
-    updateWordCount() {
-        this.wordCounter.textContent = `Words: ${this.model.gameState.words.count}`;
-    }
-
-    setLetters() {
-        for (const [letter, cell] of zip(this.letters, this.model.selectionState.cells))
-            letter.textContent = cell.letter
-    }
-
-    resetLetterPathAndSelectedCells() {
-        this.letterPath.innerHTML = '';
-        this.model.selectionState.path.indices.forEach(
-            (index) => this.setCellColor(index, '')
-        );
-    }
-
-    updateSelectedLetters() {
-        const { word, path, cell } = this.model.selectionState;
-        this.selectedLetters.textContent = word.textContent;
-        this.selectedLetters.style.backgroundColor = word.backgroundColor;
-        this.selectedLetters.style.color = word.color;
-        this.selectedLetters.style.fontWeight = word.fontWeight;
-        this.letterPath.style.fill = path.color;
-        this.letterPath.style.stroke = path.color;
-        path.targets.forEach((index) => this.setCellColor(index, cell.current.data.color));
-    }
-
-    setCellColor(index, color) {
-        const letter = this.letters[index];
-        letter.style.borderColor = color;
-        letter.style.color = color;
+    hideInputError(form) {
+        const inputBorder = this.inputBorders[form];
+        inputBorder.style.setProperty("--input-border-color", '');
+        this.inputError.remove();
     }
 
 
     /*................RESULTS................*/
 
     updateGameRecap() {
-        const { game, words } = this.model.gameState;
+        const { game, words } = this.model.game;
         this.finalScore.textContent = game.score;
         this.longestWord.textContent = words.longest;
     }

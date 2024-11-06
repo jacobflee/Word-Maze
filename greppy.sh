@@ -1,5 +1,7 @@
 #!/bin/bash
 
+clear
+
 query=$1
 
 if [ -z $query ]; then
@@ -14,7 +16,7 @@ grep -rn $query . --include="*.js" --exclude-dir={.git} > $temp_file
 
 count=$(wc -l < $temp_file)
 
-cat $temp_file | sed 's/\([^:]*:[^:]*\):/\n\1:\n/g' | sed "s/.*$query/$query/"
+cat $temp_file | sed 's/\([^:]*\)[[:space:]]*:[[:space:]]*\([^:]*\):[[:space:]]*/\n\1:\2\n/g'
 
 echo && echo "found:" $count && echo
 
