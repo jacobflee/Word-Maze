@@ -1,4 +1,5 @@
-import { Controller } from './modules/controller/Controller.js'
+import { Controller } from './modules/Controller.js'
 
 
+localStorage.clear();
 new Controller();

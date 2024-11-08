@@ -1,14 +1,12 @@
-import { Model } from '../model/Model.js'
-import { View } from '../view/View.js'
-import { Game } from './Game.js'
-import { addEventListeners } from '../utils.js'
+import { utils } from './utils.js'
+import { Model } from './Model.js'
+import { View } from './View.js'
 
 
 export class Controller {
     constructor() {
         this.model = new Model();
         this.view = new View(this.model);
-        this.game = new Game(this.model, this.view);
         this.initializeEventHandlers();
     }
 
@@ -20,12 +18,12 @@ export class Controller {
         );
 
         // BUTTONS
-        addEventListeners(
+        utils.dom.addEventListeners(
             this.view.homeBtns,
             'click',
             () => this.switchScreen('home')
         );
-        addEventListeners(
+        utils.dom.addEventListeners(
             Object.values(this.view.modeBtns),
             'click',
             (event) => this.startMode(event)
@@ -60,21 +58,21 @@ export class Controller {
         );
         
         // CELLS
-        addEventListeners(
+        utils.dom.addEventListeners(
             this.view.touchTargets,
             ['mousedown', 'mousemove', 'touchstart', 'touchmove'],
-            (event) => this.game.handleCellInteraction(event)
+            (event) => this.handleCellInteraction(event)
         );
-        addEventListeners(
+        utils.dom.addEventListeners(
             window,
             ['touchcancel', 'touchend', 'mouseup'],
-            () => this.game.endSelection()
+            () => this.endSelection()
         );
     }
 
     switchScreen(screen) {
         this.view.updateScreenDisplay('none');
-        this.model.updateCurrentScreen(screen);
+        this.model.setCurrentScreen(screen);
         this.view.updateScreenDisplay('');
     }
 
@@ -116,16 +114,14 @@ export class Controller {
     }
 
     async startMode(event) {
-        if (this.model.loading) return
-        this.model.setLoading(true);
+        if (this.model.navigation.loading) return
         this.model.setMode(event.currentTarget.dataset.mode);
         this.view.setButtonAsLoading();
-        this.model.game.reset();
-        switch (this.model.mode) {
+        switch (this.model.navigation.mode) {
             case 'timed':
                 await this.initializeGameData();
                 this.view.selectTimedMode();
-                this.game.startTimer();
+                this.startTimer();
                 break
             case 'free':
                 await this.initializeGameData();
@@ -153,7 +149,7 @@ export class Controller {
 
     async initializeGameData() {
         await this.model.initializeGameData();
-        this.view.game.setLetters();
+        this.view.setLetters();
     }
 
 
@@ -164,13 +160,88 @@ export class Controller {
         const userName = event.currentTarget['user-name'].value;
     }
 
+    startTimer() {
+        this.model.startTimer(() => this.updateTimer());
+    }
 
-    /*................RESULTS................*/
+    updateTimer() {
+        this.view.updateTimer();
+        if (this.model.game.time.remaining === 0) {
+            this.displayResults();
+        }
+    }
 
     displayResults() {
-        const { game, words } = this.model.game;
-        this.view.updateGameRecap(game.score, words.longest);
+        const { score, words } = this.model.game;
+        this.view.updateGameRecap(score, words.longest);
         this.switchScreen('results');
-        this.view.animations.barGraph(words);
+        this.view.animateChart(words);
+    }
+
+    /*................SELECTION................*/
+
+    handleCellInteraction(event) {
+        const start = ['mousedown', 'touchstart'].includes(event.type);
+        if (start) {
+            this.model.startSelection();
+        }
+        if (!this.model.selection.selecting) return
+        if (event.type === 'touchmove') {
+            var touchTarget = this.view.getElementAtTouchPoint(event.touches[0]);
+            if (touchTarget?.className !== 'touch-target') return
+        } else {
+            var touchTarget = event.currentTarget;
+        }
+        const index = touchTarget.parentElement.dataset.index;
+        this.model.updateTargetCell(index);
+        if (!this.model.selection.cell.current.valid) return
+        this.view.animateCellSelection(this.view.letters[index]);
+        this.drawPath();
+        this.model.addSelectedCell();
+        this.view.updateSelectedLetters();
+    }
+
+    drawPath() {
+        this.drawSelectionCircle();
+        if (this.model.selection.cell.previous.data) {
+            this.drawConnectionLine();
+        }
+    }
+
+    drawSelectionCircle() {
+        const index = this.model.selection.cell.current.index;
+        const cell = this.view.cells[index];
+        const [cx, cy] = this.getCellCenter(cell);
+        const r = cell.clientWidth / 14.5;
+        this.view.createSelectionCircle(cx, cy, r);
+    }
+
+    drawConnectionLine() {
+        const { current, previous } = this.model.selection.cell;
+        const currentCell = this.view.cells[current.index];
+        const previousCell = this.view.cells[previous.index];
+        const strokeWidth = currentCell.clientWidth / 6.5;
+        const [x1, y1] = this.getCellCenter(previousCell);
+        const [x2, y2] = this.getCellCenter(currentCell);
+        this.view.createConnectionLine(strokeWidth, x1, y1, x2, y2);
+    }
+
+    getCellCenter(cell) {
+        const x = cell.offsetLeft + cell.clientWidth / 2;
+        const y = cell.offsetTop + cell.clientHeight / 2;
+        return [x, y]
+    }
+
+    endSelection() {
+        const { selecting, word } = this.model.selection;
+        if (!selecting) return
+        if (word.valid && !word.found) {
+            this.view.animateScoreIncrease(this.model.game.score, word.points);
+            this.model.addFoundWord();
+            this.view.updateWordCount();
+        }
+        this.view.animateWordFadeOut();
+        this.view.resetLetterPathAndSelectedCells();
+        this.model.resetSelection();
     }
 }

@@ -1,3 +1,12 @@
+BUG: open game first click doesn't get repsonse
+
+
+consider in addSelectedCell making it class based (add remove class) instead of dom manipulation
+
+
+update vs set
+
+
 implement startMode and friendSearch
 
 

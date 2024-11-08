@@ -1,9 +1,4 @@
 export class API {
-    constructor(model) {
-        this.model = model;
-    }
-
-
     /*................CREATE................*/
 
     async createNewUser(userName) {
@@ -24,8 +19,7 @@ export class API {
 
     /*................UPATE................*/
 
-    async updateUserName(userName) {
-        const userId = this.model.user.id;
+    async updateUserName(userId, userName) {
         const url = '/update_user_name';
         const params = {
             method: 'POST',
@@ -40,8 +34,7 @@ export class API {
         }
     }
 
-    async updateOnlineStatus(onlineStatus) {
-        const userId = this.model.user.id;
+    async updateOnlineStatus(userId, onlineStatus) {
         const url = '/update_online_status';
         const params = {
             method: 'POST',
@@ -56,8 +49,7 @@ export class API {
         }
     }
 
-    async updateRandomMatchQuery(randomMatchQuery) {
-        const userId = this.model.user.id;
+    async updateRandomMatchQuery(userId, randomMatchQuery) {
         const url = '/update_random_search_query';
         const params = {
             method: 'POST',
@@ -72,8 +64,7 @@ export class API {
         }
     }
 
-    async updateFriendMatchQuery(friendMatchQuery) {
-        const userId = this.model.user.id;
+    async updateFriendMatchQuery(userId, friendMatchQuery) {
         const url = '/update_friend_search_query';
         const params = {
             method: 'POST',

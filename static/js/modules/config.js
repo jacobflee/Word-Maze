@@ -1,49 +1,63 @@
-export const COLORS = {
-    DUPLICATE: '#DCDC28',
-    VALID: '#14B428',
-    SELECTED: '#2850F0',
-    SCORE: '#FF0',
-    CHART_BAR: '#39D',
-    LETTER_PATH_SELECTED: '#F00',
-    LETTER_PATH_VALID: '#FFF',
-    WORD_VALID: '#000',
-    BACKGROUND: {
-        PRIMARY: '#126',
-        SECONDARY: '#000',
-    },
-    HIGHLIGHT: {
-        PRIMARY: '#01AFD1',
-        SECONDARY: '#F00',
-    },
-    TEXT: {
-        PRIMARY: '#FFF',
-        SECONDARY: '#888',
-        TERTIARY: '#F00',
-    },
-};
+export const config = (() => {
+    const COLOR = {
+        CELL: {
+            SELECTED: '#25E',
+            VALID: '#1B2',
+            DUPLICATE: '#DD2',
+        },
+        PATH: {
+            SELECTED: '#F00',
+            VALID: '#FFF',
+        },
+        WORD: {
+            VALID: {
+                BACKGROUND: '#1B2',
+                TEXT: '#000',
+            },
+            DUPLICATE: '#DD2',
+        },
+        SCORE: '#FF0',
+        CHART: '#39D',
+        ERROR: '#F00',
+        WARNING: '#F00',
+        BACKGROUND: {
+            PRIMARY: '#000',
+            SECONDARY: '#126',
+        },
+        HIGHLIGHT: {
+            PRIMARY: '#0BD',
+        },
+        TEXT: {
+            PRIMARY: '#FFF',
+            SECONDARY: '#888',
+        },
+    };
 
-export const POINTS = {
-    3: 100,
-    4: 400,
-    5: 800,
-    6: 1400,
-    7: 2200,
-    8: 3200,
-    9: 4400,
-    10: 5800,
-    11: 7400,
-    12: 9200,
-    13: 11200,
-    14: 13400,
-    15: 15800,
-};
+    const POINTS = {
+        3: 100,
+        4: 400,
+        5: 800,
+        6: 1400,
+        7: 2200,
+        8: 3200,
+        9: 4400,
+        10: 5800,
+        11: 7400,
+        12: 9200,
+        13: 11200,
+        14: 13400,
+        15: 15800,
+    };
 
-export const TIMING = {
-    GAME_DURATION: 91,
-    ANIMATION: {
-        CELL_SELECTION: 12,
-        WORD_FADE_OUT: 12,
-        SCORE_INCREASE: 28,
-        BAR_GRAPH: 120,
-    },
-};
+    const DURATION = {
+        GAME: 91,
+        ANIMATION: {
+            CELL: 12,
+            WORD: 12,
+            SCORE: 28,
+            GRAPH: 120,
+        },
+    };
+
+    return { COLOR, POINTS, DURATION }
+})()
