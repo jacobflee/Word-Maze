@@ -31,10 +31,10 @@
                 <summary id="game-name">Word Maze</summary>
                 <span>hi grandma!</span>
             </details>
-            <form id="user-name-form">
+            <form id="user-name-form" data-form="user">
                 <div class="input-wrapper">
                     <input type="text" id="user-name" name="user-name" placeholder="create username" autocomplete="off"
-                        pattern="^\S.*\S$|^\S$" required />
+                        pattern="^\S.*\S$|^\S$" maxlength="25" data-form="user" spellcheck="false" required />
                     <span class="input-border" data-form="user"></span>
                 </div>
             </form>
@@ -65,15 +65,15 @@
                 <i class="icon-home"></i>
             </button>
         </header>
-        <form id="search-form">
+        <form id="search-form" data-form="friend">
             <div class="input-wrapper from-side">
-                <input type="text" name="user-name" placeholder="add a friend..." autocomplete="off"
-                    pattern="^\S.*\S$|^\S$" required />
+                <input type="text" id="friend-user-name" name="user-name" placeholder="search for a friend..." autocomplete="off"
+                    pattern="^\S.*\S$|^\S$" maxlength="25" data-form="friend" spellcheck="false" required />
                 <span class="input-border" data-form="friend"></span>
             </div>
         </form>
-
-
+        <div id="friends">
+        </div>
     </section>
 
 

@@ -19,7 +19,8 @@ export const config = (() => {
         SCORE: '#FF0',
         CHART: '#39D',
         ERROR: '#F00',
-        WARNING: '#F00',
+        WARNING: '#FA0',
+        SUCCESS: '#0D2',
         BACKGROUND: {
             PRIMARY: '#000',
             SECONDARY: '#126',
@@ -52,6 +53,7 @@ export const config = (() => {
     const DURATION = {
         GAME: 91,
         ANIMATION: {
+            MESSAGE: 12,
             CELL: 12,
             WORD: 12,
             SCORE: 28,

@@ -8,16 +8,18 @@ export class Controller {
         this.model = new Model();
         this.view = new View(this.model);
         this.initializeEventHandlers();
+
+        // this.view.modeBtns['friend'].click();
     }
 
     initializeEventHandlers() {
-        // WINDOW
+        /*................WINDOW................*/
         window.addEventListener(
             'resize',
             () => this.view.setAppHeight()
         );
 
-        // BUTTONS
+        /*................BUTTONS................*/
         utils.dom.addEventListeners(
             this.view.homeBtns,
             'click',
@@ -32,32 +34,40 @@ export class Controller {
             'click',
             () => this.displayResults()
         );
+        utils.dom.addEventListeners(
+            Array.from(this.view.friends.children),
+            'click',
+            (event) => this.initiateFriendGame(event)
+        );
 
-        // FORMS
+        /*................INPUTS................*/
+        utils.dom.addEventListeners(
+            this.view.inputs,
+            'input',
+            (event) => this.handleInput(event)
+        );
+        utils.dom.addEventListeners(
+            this.view.inputs,
+            'invalid',
+            (event) => this.handleInvalidInput(event)
+        );
+        utils.dom.addEventListeners(
+            this.view.inputs,
+            'blur',
+            (event) => this.handleInputBlur(event)
+        );
+
+        /*................FORMS................*/
         this.view.userNameForm.addEventListener(
             'submit',
-            (event) => this.updateUserName(event)
+            (event) => this.submitUserNameForm(event)
         );
         this.view.searchForm.addEventListener(
             'submit',
-            (event) => this.searchFriend(event)
+            (event) => this.submitFriendForm(event)
         );
 
-        // INPUTS
-        this.view.userNameInput.addEventListener(
-            'input',
-            () => this.handleUserNameInput()
-        );
-        this.view.userNameInput.addEventListener(
-            'blur',
-            () => this.handleUserNameBlur()
-        );
-        this.view.userNameInput.addEventListener(
-            'invalid',
-            (event) => this.handleUserNameInvalid(event, 'user')
-        );
-        
-        // CELLS
+        /*................CELLS................*/
         utils.dom.addEventListeners(
             this.view.touchTargets,
             ['mousedown', 'mousemove', 'touchstart', 'touchmove'],
@@ -70,94 +80,142 @@ export class Controller {
         );
     }
 
+
+    /*................UI................*/
+
     switchScreen(screen) {
         this.view.updateScreenDisplay('none');
         this.model.setCurrentScreen(screen);
         this.view.updateScreenDisplay('');
     }
 
-
-    /*................HOME................*/
-
-    async updateUserName(event) {
-        event.preventDefault();
-        const userName = event.currentTarget['user-name'].value;
-        await this.model.setUserName(userName);
-        if (this.model.user.error) {
-            this.view.showInputError('user');
-        } else {
-            this.view.blurActiveElement();
-        }
-    }
-
-    handleUserNameInvalid(event, form) {
-        event.preventDefault();
-        const userName = event.currentTarget.value;
-        this.model.setFormError(form, userName);
-        this.view.showInputError('user');
-    }
-
-    handleUserNameInput() {
-        this.resetInputError('user');
-        this.view.setUserNameWidth();
-    }
-
-    handleUserNameBlur() {
-        this.resetInputError('user');
-        this.view.setUserName();
-    }
-
-    resetInputError(form) {
-        if (!this.model[form].error) return
-        this.model.setFormError(form, null);
-        this.view.hideInputError(form);
-    }
-
     async startMode(event) {
-        if (this.model.navigation.loading) return
+        if (this.model.ui.loading) return
         this.model.setMode(event.currentTarget.dataset.mode);
         this.view.setButtonAsLoading();
-        switch (this.model.navigation.mode) {
+        switch (this.model.ui.mode) {
             case 'timed':
                 await this.initializeGameData();
                 this.view.selectTimedMode();
                 this.startTimer();
+                this.switchScreen('game');
+                this.view.resetButton();
+                this.model.resetLoading();
                 break
             case 'free':
                 await this.initializeGameData();
                 this.view.selectFreePlayMode();
+                this.switchScreen('game');
+                this.view.resetButton();
+                this.model.resetLoading();
                 break
             case 'friend':
-                if (this.model.user.name === '') {
+                if (!this.model.user.name) {
                     this.view.userNameInput.focus();
-                } else {
-                    this.switchScreen('friend');
+                    this.view.resetButton();
+                    this.model.resetLoading();
+                    return;
+                }
+                this.switchScreen('friend');
+                this.view.resetButton();
+                this.model.resetLoading();
+                if (this.model.user.friends.ids.length === 0) {
+                    this.view.searchForm['user-name'].focus();
+                    return
                 }
                 break
             case 'random':
-                if (this.model.user.name === '') {
-                    this.view.userNameInput.focus();
-                } else {
-                    this.view.selectVSRandomMode();
-                }
+                this.view.resetButton();
+                this.model.resetLoading();
+                alert('unavailable');
                 break
         }
-        this.switchScreen('game');
-        this.view.resetButton();
-        this.model.setLoading(false);
     }
+
+
+    /*................INPUTS................*/
+
+    handleInput(event) {
+        const form = event.currentTarget.dataset['form'];
+        if (this.model.ui.message?.error) {
+            this.resetInputMessage(form);
+        }
+        if (form === 'user') {
+            this.view.setUserNameWidth();
+        }
+    }
+
+    handleInvalidInput(event) {
+        event.preventDefault();
+        const form = event.currentTarget.dataset['form'];
+        const userName = event.currentTarget.value;
+        this.model.setFormError(userName);
+        this.view.showInputMessage(form);
+    }
+
+    handleInputBlur(event) {
+        const form = event.currentTarget.dataset['form'];
+        if (this.model.ui.message?.error) {
+            this.resetInputMessage(form);
+        }
+        if (form === 'user') {
+            this.view.setUserName();
+        } else if (form === 'friend') {
+            this.view.resetFriendInput();
+        }
+    }
+
+    resetInputMessage(form) {
+        this.model.resetMessage();
+        this.view.hideInputMessage(form);
+    }
+
+    async submitUserNameForm(event) {
+        event.preventDefault();
+        const userName = event.currentTarget['user-name'].value;
+        await this.model.setUserName(userName);
+        if (!this.model.ui.message) {
+            document.activeElement.blur();
+            return
+        }
+        if (this.model.ui.message.error) {
+            this.view.showInputMessage('user');
+        } else {
+            document.activeElement.blur();
+            this.view.showInputMessage('user');
+            this.model.resetMessage();
+            setTimeout(() => this.view.animateMessageFadeOut(), 2000);
+        }
+    }
+    
+    async submitFriendForm(event) {
+        event.preventDefault();
+        const userName = event.currentTarget['user-name'].value;
+        await this.model.addFriend(userName);
+        if (this.model.ui.message.error) {
+            this.view.showInputMessage('friend');
+        } else {
+            this.view.injectFriendCards();
+            document.activeElement.blur();
+            this.view.showInputMessage('friend');
+            this.model.resetMessage();
+            setTimeout(() => this.view.animateMessageFadeOut(), 2000);
+        }
+    }
+
+    initiateFriendGame(event) {
+        const friendCard = event.currentTarget;
+        const friendId = friendCard.dataset['userId'];
+        const friendName = friendCard.dataset['userName'];
+        alert(`initiate match with:\n      user-id:  ${friendId}\nuser-name:  ${friendName}`);
+    }
+
+
+    /*................GAME................*/
 
     async initializeGameData() {
         await this.model.initializeGameData();
         this.view.setLetters();
-    }
-
-
-    /*................FRIEND................*/
-
-    searchFriend(event) {
-        event.preventDefault();
-        const userName = event.currentTarget['user-name'].value;
     }
 
     startTimer() {
@@ -165,75 +223,35 @@ export class Controller {
     }
 
     updateTimer() {
-        this.view.updateTimer();
+        this.view.updateTimerDisplay();
         if (this.model.game.time.remaining === 0) {
             this.displayResults();
         }
     }
-
-    displayResults() {
-        const { score, words } = this.model.game;
-        this.view.updateGameRecap(score, words.longest);
-        this.switchScreen('results');
-        this.view.animateChart(words);
-    }
-
-    /*................SELECTION................*/
 
     handleCellInteraction(event) {
         const start = ['mousedown', 'touchstart'].includes(event.type);
         if (start) {
             this.model.startSelection();
         }
-        if (!this.model.selection.selecting) return
+        if (!this.model.game.selection.selecting) return
         if (event.type === 'touchmove') {
-            var touchTarget = this.view.getElementAtTouchPoint(event.touches[0]);
+            var touchTarget = document.elementFromPoint(event.touches[0].clientX, event.touches[0].clientY);
             if (touchTarget?.className !== 'touch-target') return
         } else {
             var touchTarget = event.currentTarget;
         }
         const index = touchTarget.parentElement.dataset.index;
         this.model.updateTargetCell(index);
-        if (!this.model.selection.cell.current.valid) return
+        if (!this.model.game.selection.cell.current.valid) return
         this.view.animateCellSelection(this.view.letters[index]);
-        this.drawPath();
+        this.view.drawPath();
         this.model.addSelectedCell();
         this.view.updateSelectedLetters();
     }
 
-    drawPath() {
-        this.drawSelectionCircle();
-        if (this.model.selection.cell.previous.data) {
-            this.drawConnectionLine();
-        }
-    }
-
-    drawSelectionCircle() {
-        const index = this.model.selection.cell.current.index;
-        const cell = this.view.cells[index];
-        const [cx, cy] = this.getCellCenter(cell);
-        const r = cell.clientWidth / 14.5;
-        this.view.createSelectionCircle(cx, cy, r);
-    }
-
-    drawConnectionLine() {
-        const { current, previous } = this.model.selection.cell;
-        const currentCell = this.view.cells[current.index];
-        const previousCell = this.view.cells[previous.index];
-        const strokeWidth = currentCell.clientWidth / 6.5;
-        const [x1, y1] = this.getCellCenter(previousCell);
-        const [x2, y2] = this.getCellCenter(currentCell);
-        this.view.createConnectionLine(strokeWidth, x1, y1, x2, y2);
-    }
-
-    getCellCenter(cell) {
-        const x = cell.offsetLeft + cell.clientWidth / 2;
-        const y = cell.offsetTop + cell.clientHeight / 2;
-        return [x, y]
-    }
-
     endSelection() {
-        const { selecting, word } = this.model.selection;
+        const { selecting, word } = this.model.game.selection;
         if (!selecting) return
         if (word.valid && !word.found) {
             this.view.animateScoreIncrease(this.model.game.score, word.points);
@@ -241,7 +259,21 @@ export class Controller {
             this.view.updateWordCount();
         }
         this.view.animateWordFadeOut();
-        this.view.resetLetterPathAndSelectedCells();
+        this.view.resetLetterPathAndCellColors();
         this.model.resetSelection();
+    }
+
+
+    /*................RESULTS................*/
+
+    displayResults() {
+        const { score, words } = this.model.game;
+        this.view.updateGameRecap(score, words.longest);
+        this.switchScreen('results');
+        if (words.count === 0) {
+            this.view.resetChart();
+        } else {
+            this.view.animateChart(words);
+        }
     }
 }

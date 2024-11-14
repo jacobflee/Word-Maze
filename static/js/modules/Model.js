@@ -1,24 +1,147 @@
 import { config } from './config.js'
 import { utils } from './utils.js'
 import { API } from './API.js'
+import { Storage } from './Storage.js'
 
 
 export class Model {
     constructor() {
         this.api = new API();
-        this.navigation = {
+        this.storage = new Storage();
+        this.ui = {
             loading: false,
             screen: 'home',
             mode: '',
+            message: null,
         };
-        this.user = {
-            name: localStorage.getItem('userName'),
-            id: localStorage.getItem('userId'),
-            error: null,
-        }
+        this.user = this.storage.getUser();
         this.resetGame();
-        this.resetSelection();
     }
+
+
+    /*................UI................*/
+
+    resetLoading() {
+        this.ui.loading = false;
+    }
+
+    setMode(mode) {
+        this.ui.loading = true;
+        this.ui.mode = mode;
+        this.resetGame();
+    }
+
+    setCurrentScreen(screen) {
+        this.ui.screen = screen;
+    }
+
+
+    /*................INPUTS................*/
+
+    resetMessage() {
+        this.ui.message = null;
+    }
+
+    setFormError(userName) {
+        if (userName) {
+            this.setErrorMessage('username has outer spaces');
+        } else {
+            this.setErrorMessage('username is empty');
+        }
+    }
+
+    setErrorMessage(text) {
+        this.ui.message = {
+            color: config.COLOR.ERROR,
+            borderColor: config.COLOR.ERROR,
+            class: 'icon-error',
+            error: true,
+            text: text,
+        };
+    }
+
+    setWarningMessage(text) {
+        this.ui.message = {
+            color: config.COLOR.WARNING,
+            borderColor: config.COLOR.WARNING,
+            class: 'icon-warning',
+            error: true,
+            text: text,
+        };
+    }
+
+    setSuccessMessage(text) {
+        this.ui.message = {
+            color: config.COLOR.SUCCESS,
+            borderColor: '',
+            class: 'icon-checkmark',
+            error: false,
+            text: text,
+        };
+    }
+
+    async setUserName(userName) {
+        if (userName === this.user.name) return
+        if (this.user.id) {
+            await this.updateUserName(userName);
+        } else {
+            await this.createNewUser(userName);
+        }
+    }
+
+    async updateUserName(userName) {
+        const data = await this.api.updateUserName(this.user.id, userName);
+        if (data?.error) {
+            this.setErrorMessage(data.error);
+        } else {
+            this.user.name = userName;
+            this.storage.setUserName(this.user.name);
+            this.setSuccessMessage('username changed successfully');
+        }
+    }
+
+    async createNewUser(userName) {
+        const data = await this.api.createNewUser(userName);
+        if (data?.error) {
+            this.setErrorMessage(data.error);
+        } else {
+            this.user.id = data['user_id'];
+            this.storage.setUserId(this.user.id);
+            this.user.name = userName;
+            this.storage.setUserName(this.user.name);
+            this.setSuccessMessage('user created successfully');
+        }
+    }
+
+    async addFriend(userName) {
+        const friends = this.user.friends;
+        if (friends.names.has(userName)) {
+            const index = friends.order.findIndex((friend) => friend.userName === userName);
+            const [friend] = friends.order.splice(index, 1);
+            friends.order.unshift(friend);
+            this.storage.setFriendsOrder(friends.order);
+            this.setSuccessMessage(`you're already friends`);
+            return
+        }
+        if (userName === this.user.name) {
+            this.setWarningMessage(`that's your username`)
+            return
+        }
+        const data = await this.api.fetchUserId(userName);
+        if (data?.error) {
+            this.setErrorMessage(data.error);
+        } else {
+            const userId = data['user_id'];
+            friends.order.unshift({ userId, userName });
+            friends.ids.add(userId);
+            friends.names.add(userName);
+            this.storage.setFriends(friends);
+            this.setSuccessMessage('friend added successfully');
+        }
+    }
+
+
+    /*................GAME................*/
 
     resetGame() {
         this.game = {
@@ -26,7 +149,7 @@ export class Model {
             words: {
                 count: 0,
                 longest: '',
-                valid: null,
+                valid: utils.object.createObject(13, (i) => i + 3, () => null),
                 found: utils.object.createObject(13, (i) => i + 3, () => new Set()),
                 length: utils.object.createObject(13, (i) => i + 3, () => 0),
             },
@@ -37,11 +160,13 @@ export class Model {
                 remaining: config.DURATION.GAME,
             },
             cells: Array.from({ length: 16 }, () => ({})),
+            selection: null,
         };
+        this.resetSelection();
     }
 
     resetSelection() {
-        this.selection = {
+        this.game.selection = {
             selecting: false,
             word: {
                 text: '',
@@ -73,80 +198,18 @@ export class Model {
         this.game.cells.forEach((cell) => cell.color = '');
     }
 
-    startSelection() {
-        this.selection.selecting = true;
-    }
-
-    updateTargetCell(index) {
-        const { current, previous } = this.selection.cell;
-        current.index = index;
-        current.data = this.game.cells[index];
-        if (current.data.color !== '') { // cell is already selected
-            current.valid = false;
-        } else if (!previous.data) { // cell is the first selected
-            current.valid = true;
-        } else { // cell is within one space of previous
-            const rowDifference = Math.abs(current.data.row - previous.data.row);
-            const columnDifferent = Math.abs(current.data.column - previous.data.column);
-            current.valid = rowDifference <= 1 && columnDifferent <= 1
-        }
-    }
-
-    setLoading(value) {
-        this.navigation.loading = value;
-    }
-
-    setCurrentScreen(screen) {
-        this.navigation.screen = screen;
-    }
-
-    setMode(mode) {
-        this.navigation.loading = true;
-        this.navigation.mode = mode;
-        this.resetGame();
-    }
-
-    setFormError(form, userName) {
-        switch (userName) {
-            case null:
-                this[form].error = null;
-                break
-            case '':
-                this[form].error = 'username is empty';
-                break
-            default:
-                this[form].error = 'username has outer spaces';
-        }
-    }
-
-    async setUserName(userName) {
-        if (this.user.name === userName) return
-        const apiCall = this.user.id
-            ? this.api.updateUserName(this.user.id, userName)
-            : this.api.createNewUser(userName);
-        const data = await apiCall;
-        this.user.error = data?.error;
-        if (this.user.error) return
-        if (!this.user.id) {
-            this.user.id = data['user_id'];
-            localStorage.setItem('userId', this.user.id);
-        }
-        this.user.name = userName;
-        localStorage.setItem('userName', this.user.name);
-    }
-
     async initializeGameData() {
         const { board, words } = await this.api.fetchNewGameData();
-        const map = ([length, words]) => [length, new Set(words)];
-        const entries = Object.entries(words).map(map);
-        this.game.words.valid = Object.fromEntries(entries);
-        this.game.cells.forEach((cell, index) => {
-            const row = Math.floor(index / 4);
-            const column = index % 4;
-            cell.row = row + 1;
-            cell.column = column + 1;
-            cell.letter = board[row][column];
-        });
+        for (let i = 3; i < 16; i++) {
+            this.game.words.valid[i] = new Set(words[i]);
+        }
+        for (let i = 0; i < 16; i++) {
+            const row = Math.floor(i / 4);
+            const column = i % 4;
+            this.game.cells[i].row = row + 1;
+            this.game.cells[i].column = column + 1;
+            this.game.cells[i].letter = board[row][column];
+        }
     }
 
     startTimer(updateTimerDisplay) {
@@ -157,7 +220,9 @@ export class Model {
     updateTimer(updateTimerDisplay) {
         this.game.time.remaining--;
         this.game.time.text = utils.string.secondsToMSS(this.game.time.remaining);
-        this.game.time.color = this.game.time.remaining < 10 ? config.COLOR.WARNING : '';
+        this.game.time.color = this.game.time.remaining < 10
+            ? config.COLOR.WARNING
+            : '';
         updateTimerDisplay();
         if (this.game.time.remaining === 0) {
             clearInterval(this.game.time.id);
@@ -165,22 +230,31 @@ export class Model {
         }
     }
 
-    addFoundWord() {
-        const word = this.selection.word.text;
-        this.game.words.count++;
-        this.game.words.found[word.length].add(word);
-        this.game.words.length[word.length]++;
-        this.game.score += config.POINTS[word.length];
-        if (word.length > this.game.words.longest.length) {
-            this.game.words.longest = word;
+    startSelection() {
+        this.game.selection.selecting = true;
+    }
+
+    updateTargetCell(index) {
+        const { current, previous } = this.game.selection.cell;
+        current.index = index;
+        current.data = this.game.cells[index];
+        if (current.data.color !== '') {
+            // cell is already selected
+            current.valid = false;
+        } else if (!previous.data) {
+            // cell is the first selected
+            current.valid = true;
+        } else {
+            // cell is within one space of previous
+            const rowDifference = Math.abs(current.data.row - previous.data.row);
+            const columnDifferent = Math.abs(current.data.column - previous.data.column);
+            current.valid = rowDifference <= 1 && columnDifferent <= 1
         }
     }
 
-    /*................GAME................*/
-
     addSelectedCell() {
-        const { word, path } = this.selection;
-        const { current, previous } = this.selection.cell;
+        const { word, path } = this.game.selection;
+        const { current, previous } = this.game.selection.cell;
         const { cells, words } = this.game;
         path.indices.push(current.index);
         word.text += current.data.letter;
@@ -219,5 +293,17 @@ export class Model {
         }
         previous.index = current.index;
         previous.data = current.data;
+    }
+
+    addFoundWord() {
+        const words = this.game.words;
+        const word = this.game.selection.word;
+        words.count++;
+        words.found[word.text.length].add(word.text);
+        words.length[word.text.length]++;
+        this.game.score += config.POINTS[word.text.length];
+        if (word.text.length > words.longest.length) {
+            this.game.words.longest = word.text;
+        }
     }
 }

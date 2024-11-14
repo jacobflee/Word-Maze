@@ -10,7 +10,11 @@ export class View {
         this.setDOMReferences();
         this.setUserName();
         this.initializeScreens();
+        this.injectFriendCards();
     }
+
+
+    /*................CSS................*/
 
     setAppHeight() {
         document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
@@ -19,25 +23,43 @@ export class View {
     setColorConfigs() {
         document.documentElement.style.setProperty('--score-color', config.COLOR.SCORE);
         document.documentElement.style.setProperty('--chart-color', config.COLOR.CHART);
-        document.documentElement.style.setProperty('--letter-path-selected', config.COLOR.PATH.SELECTED);
+        document.documentElement.style.setProperty('--path-selected-color', config.COLOR.PATH.SELECTED);
         document.documentElement.style.setProperty('--primary-background-color', config.COLOR.BACKGROUND.PRIMARY);
         document.documentElement.style.setProperty('--secondary-background-color', config.COLOR.BACKGROUND.SECONDARY);
         document.documentElement.style.setProperty('--primary-highlight-color', config.COLOR.HIGHLIGHT.PRIMARY);
         document.documentElement.style.setProperty('--primary-text-color', config.COLOR.TEXT.PRIMARY);
         document.documentElement.style.setProperty('--secondary-text-color', config.COLOR.TEXT.SECONDARY);
-        document.documentElement.style.setProperty('--error-color', config.COLOR.TEXT.ERROR);
+        document.documentElement.style.setProperty('--success-color', config.COLOR.SUCCESS);
+        document.documentElement.style.setProperty('--warning-color', config.COLOR.WARNING);
+        document.documentElement.style.setProperty('--error-color', config.COLOR.ERROR);
     }
 
+
+    /*................DOM................*/
+
     setDOMReferences() {
+        // UI
+        this.screens = this.createDataSetObject('.screen', 'screen');
+        this.modeBtns = this.createDataSetObject('.mode-btn', 'mode');
+        this.spooler = this.createSpooler();
         this.homeBtns = document.querySelectorAll('.home-btn');
+        this.resultsBtn = document.getElementById('results-btn');
+        this.navControls = document.getElementById('nav-controls');
+
+        // INPUTS
         this.inputBorders = this.createDataSetObject('.input-border', 'form');
         this.userNameForm = document.getElementById('user-name-form');
         this.userNameInput = document.getElementById('user-name');
-        this.modeBtns = this.createDataSetObject('.mode-btn', 'mode');
         this.searchForm = document.getElementById('search-form');
-        this.letterPath = document.getElementById('letter-path');
-        this.navControls = document.getElementById('nav-controls');
-        this.resultsBtn = document.getElementById('results-btn');
+        this.inputs = document.querySelectorAll('input');
+        this.forms = document.querySelectorAll('form');
+        this.friendUserName = document.getElementById('friend-user-name');
+        this.inputMessage = this.createInputMessage();
+
+        // FRIEND
+        this.friends = document.getElementById('friends');
+
+        // GAME
         this.countdownTimer = document.getElementById('countdown-timer');
         this.wordCounter = document.getElementById('word-counter');
         this.currentScore = document.getElementById('current-score');
@@ -45,12 +67,21 @@ export class View {
         this.cells = document.querySelectorAll('.cell');
         this.letters = document.querySelectorAll('.letter');
         this.touchTargets = document.querySelectorAll('.touch-target');
+        this.letterPath = document.getElementById('letter-path');
+
+        // RESULTS
         this.finalScore = document.getElementById('final-score');
         this.longestWord = document.getElementById('longest-word');
-        this.screens = this.createDataSetObject('.screen', 'screen');
-        this.spooler = this.createSpooler();
-        this.inputError = this.createInputError();
         this.chartBars = this.createChartBars();
+    }
+
+    createDataSetObject(query, attribute) {
+        return Object.fromEntries(
+            Array.from(
+                document.querySelectorAll(query),
+                (element) => [element.dataset[attribute], element]
+            )
+        )
     }
 
     createChartBars() {
@@ -60,73 +91,49 @@ export class View {
     }
 
     createSpooler() {
-        const icon = document.createElement("i");
-        icon.className = "icon-spooler";
-        const text = document.createElement("span");
-        text.className = "loading";
+        const icon = document.createElement('i');
+        icon.className = 'icon-spooler';
+        const text = document.createElement('span');
+        text.className = 'loading';
         return { icon, text }
     }
 
-    createInputError() {
-        const inputError = document.createElement("div");
-        inputError.className = "input-error";
-        const icon = document.createElement("i");
-        icon.className = "icon-error";
-        const text = document.createElement("span");
-        inputError.appendChild(icon);
-        inputError.appendChild(text);
-        return inputError
+    createInputMessage() {
+        const inputMessage = document.createElement('div')
+        inputMessage.className = 'input-message';
+        const icon = document.createElement('i');
+        const text = document.createElement('span');
+        inputMessage.append(icon, text);
+        return inputMessage
     }
 
-    createDataSetObject(query, attribute) {
-        const elements = document.querySelectorAll(query);
-        const map = (element) => [element.dataset[attribute], element];
-        const entries = Array.from(elements, map);
-        return Object.fromEntries(entries)
-    }
+
+    /*................UI................*/
 
     initializeScreens() {
-        for (const [screen, element] of Object.entries(this.screens)) {
-            if (screen !== this.model.navigation.screen) {
-                element.style.display = 'none';
+        for (const [name, screen] of Object.entries(this.screens)) {
+            if (name !== this.model.ui.screen) {
+                screen.style.display = 'none';
             }
         }
     }
 
     updateScreenDisplay(display) {
-        this.screens[this.model.navigation.screen].style.display = display;
-    }
-
-    blurActiveElement() {
-        document.activeElement.blur();
-    }
-
-    getElementAtTouchPoint(touch) {
-        return document.elementFromPoint(touch.clientX, touch.clientY)
-    }
-
-
-    /*................HOME................*/
-
-    setUserName() {
-        this.userNameInput.value = this.model.user.name;
-        this.setUserNameWidth();
-    }
-
-    setUserNameWidth() {
-        this.userNameInput.style.width = `${this.userNameInput.value.length}ch`;
+        this.screens[this.model.ui.screen].style.display = display;
     }
 
     selectTimedMode() {
         this.navControls.style.display = 'none';
         this.countdownTimer.style.display = '';
-        this.startMode();
+        this.currentScore.textContent = 0;
+        this.updateWordCount();
     }
 
     selectFreePlayMode() {
         this.navControls.style.display = '';
         this.countdownTimer.style.display = 'none';
-        this.startMode();
+        this.currentScore.textContent = 0;
+        this.updateWordCount();
     }
 
     selectVSFriendMode() {
@@ -137,13 +144,8 @@ export class View {
         // implement
     }
 
-    startMode() {
-        this.updateWordCount(0);
-        this.currentScore.textContent = 0;
-    }
-
     setButtonAsLoading() {
-        const modeBtn = this.modeBtns[this.model.navigation.mode];
+        const modeBtn = this.modeBtns[this.model.ui.mode];
         modeBtn.children[0].style.display = 'none';
         modeBtn.children[1].style.display = 'none';
         const fragment = document.createDocumentFragment();
@@ -153,64 +155,81 @@ export class View {
     }
 
     resetButton() {
-        const modeBtn = this.modeBtns[this.model.navigation.mode];
+        const modeBtn = this.modeBtns[this.model.ui.mode];
         modeBtn.removeChild(this.spooler.icon);
         modeBtn.removeChild(this.spooler.text);
         modeBtn.children[0].style.display = '';
         modeBtn.children[1].style.display = '';
     }
 
-    showInputError(form) {
+
+    /*................INPUTS................*/
+
+    injectFriendCards() {
+        const documentFragment = document.createDocumentFragment();
+        const friends = this.model.user.friends.order.slice(0, 8);
+        friends.forEach((friend) => {
+            const friendCard = this.createFriendCard(friend);
+            documentFragment.append(friendCard);
+        });
+        this.friends.replaceChildren(documentFragment);
+    }
+
+    createFriendCard(friend) {
+        const friendId = friend['userId'];
+        const friendName = friend['userName'];
+        const friendCard = document.createElement('button');
+        friendCard.className = 'friend';
+        friendCard.textContent = friendName;
+        friendCard.setAttribute('data-user-id', friendId);
+        friendCard.setAttribute('data-user-name', friendName);
+        return friendCard
+    }
+
+    setUserName() {
+        this.userNameInput.value = this.model.user.name;
+        this.setUserNameWidth();
+    }
+
+    setUserNameWidth() {
+        this.userNameInput.style.width = `${this.userNameInput.value.length}ch`;
+    }
+
+    showInputMessage(form) {
+        const message = this.model.ui.message;
         const inputBorder = this.inputBorders[form];
-        inputBorder.style.setProperty("--input-border-color", config.COLOR.ERROR);
-        this.inputError.children[1].innerHTML = this.model[form].error;
-        inputBorder.after(this.inputError);
+        inputBorder.style.setProperty('--input-border-color', message.borderColor);
+        const [icon, text] = this.inputMessage.children;
+        icon.className = message.class;
+        text.innerHTML = message.text;
+        text.style.color =  message.color;
+        inputBorder.after(this.inputMessage);
     }
 
-    hideInputError(form) {
+    hideInputMessage(form) {
         const inputBorder = this.inputBorders[form];
-        inputBorder.style.setProperty("--input-border-color", '');
-        this.inputError.remove();
+        inputBorder.style.setProperty('--input-border-color', '');
+        this.inputMessage.remove();
     }
 
-
-    /*................RESULTS................*/
-
-    updateGameRecap() {
-        const { score, words } = this.model.game;
-        this.finalScore.textContent = score;
-        this.longestWord.textContent = words.longest;
+    resetFriendInput() {
+        this.friendUserName.value = '';
     }
 
-    animateChart(words, frame = 1) {
-        if (words.count === 0) {
-            for (const [barFill, barCount] of this.chartBars) {
-                this.updateChartBar(barFill, barCount, '0%', '0');
-            }
-            return
+    animateMessageFadeOut(frame = 1) {
+        const frames = config.DURATION.ANIMATION.MESSAGE;
+        if (frame > frames) {
+            this.inputMessage.style.opacity = 1;
+            this.inputMessage.remove();
+        } else {
+            const progress = frame / frames;
+            this.inputMessage.style.opacity = 1 - progress;
+            requestAnimationFrame(() => this.animateMessageFadeOut(frame + 1));
         }
-        const frames = config.DURATION.ANIMATION.GRAPH;
-        if (frame > frames) return
-        const progress = utils.math.easeOutExponential(frame / frames);
-        for (const [barFill, barCount, i] of this.chartBars) {
-            const wordLengthCount = words.length[i + 3];
-            const width = `${100 * progress * wordLengthCount / words.count}%`;
-            const count = Math.round(progress * wordLengthCount);
-            this.updateChartBar(barFill, barCount, width, count);
-        }
-        requestAnimationFrame(() => this.animateChart(words, frame + 1));
     }
 
-    updateChartBar(barFill, barCount, width, count) {
-        barFill.style.width = width;
-        barCount.textContent = count;
-    }
 
-    updateTimer() {
-        const time = this.model.game.time;
-        this.countdownTimer.textContent = time.text;
-        this.countdownTimer.style.color = time.color;
-    }
+    /*................GAME................*/
 
     setLetters() {
         for (const [letter, cell] of utils.iterator.zip(this.letters, this.model.game.cells)) {
@@ -218,39 +237,55 @@ export class View {
         }
     }
 
-    /*................SELECTION................*/
-
-    createSelectionCircle(cx, cy, r) {
-        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-        circle.setAttribute('cx', cx);
-        circle.setAttribute('cy', cy);
-        circle.setAttribute('r', r);
-        this.letterPath.appendChild(circle);
+    updateTimerDisplay() {
+        const time = this.model.game.time;
+        this.countdownTimer.textContent = time.text;
+        this.countdownTimer.style.color = time.color;
     }
 
-    createConnectionLine(strokeWidth, x1, y1, x2, y2) {
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('stroke-width', strokeWidth);
-        line.setAttribute('x1', x1);
-        line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2);
-        line.setAttribute('y2', y2);
-        this.letterPath.appendChild(line);
+    animateCellSelection(cell, frame = 1) {
+        const frames = config.DURATION.ANIMATION.CELL;
+        if (frame > frames) return
+        const progress = frame / frames;
+        cell.style.width = `${93 + 7 * progress}%`;
+        cell.style.height = cell.style.width;
+        cell.style.borderRadius = `${40 - 15 * progress}%`;
+        cell.style.fontSize = `calc(${11.5 + 2 * progress} * var(--base-unit))`;
+        requestAnimationFrame(() => this.animateCellSelection(cell, frame + 1));
     }
 
-    updateWordCount() {
-        this.wordCounter.textContent = `Words: ${this.model.game.words.count}`;
-    }
-
-    resetLetterPathAndSelectedCells() {
-        this.letterPath.innerHTML = '';
-        for (const letter of utils.iterator.pluck(this.letters, this.model.selection.path.indices)) {
-            this.setCellColor(letter, '')
+    drawPath() {
+        this.drawSelectionCircle();
+        if (this.model.game.selection.cell.previous.data) {
+            this.drawConnectionLine();
         }
     }
 
+    drawSelectionCircle() {
+        const index = this.model.game.selection.cell.current.index;
+        const cell = this.cells[index];
+        const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        circle.setAttribute('cx', cell.offsetLeft + cell.clientWidth / 2);
+        circle.setAttribute('cy', cell.offsetTop + cell.clientHeight / 2);
+        circle.setAttribute('r', cell.clientWidth / 14.5);
+        this.letterPath.appendChild(circle);
+    }
+
+    drawConnectionLine() {
+        const { current, previous } = this.model.game.selection.cell;
+        const currentCell = this.cells[current.index];
+        const previousCell = this.cells[previous.index];
+        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('stroke-width', currentCell.clientWidth / 6.5);
+        line.setAttribute('x1', previousCell.offsetLeft + previousCell.clientWidth / 2);
+        line.setAttribute('y1', previousCell.offsetTop + previousCell.clientHeight / 2);
+        line.setAttribute('x2', currentCell.offsetLeft + currentCell.clientWidth / 2);
+        line.setAttribute('y2', currentCell.offsetTop + currentCell.clientHeight / 2);
+        this.letterPath.appendChild(line);
+    }
+
     updateSelectedLetters() {
-        const { word, path, cell } = this.model.selection;
+        const { word, path, cell } = this.model.game.selection;
         this.selectedLetters.textContent = word.textContent;
         this.selectedLetters.style.backgroundColor = word.backgroundColor;
         this.selectedLetters.style.color = word.color;
@@ -267,15 +302,16 @@ export class View {
         letter.style.color = color;
     }
 
-    animateCellSelection(cell, frame = 1) {
-        const frames = config.DURATION.ANIMATION.CELL;
+    animateScoreIncrease(score, points, frame = 1) {
+        const frames = config.DURATION.ANIMATION.SCORE;
         if (frame > frames) return
-        const progress = frame / frames;
-        cell.style.width = `${93 + 7 * progress}%`;
-        cell.style.height = cell.style.width;
-        cell.style.borderRadius = `${40 - 15 * progress}%`;
-        cell.style.fontSize = `calc(${11.5 + 2 * progress} * var(--base-unit))`;
-        requestAnimationFrame(() => this.animateCellSelection(cell, frame + 1));
+        const progress = utils.math.smoothStep(frame / frames);
+        this.currentScore.textContent = score + Math.round(points * progress);
+        requestAnimationFrame(() => this.animateScoreIncrease(score, points, frame + 1));
+    }
+
+    updateWordCount() {
+        this.wordCounter.textContent = `Words: ${this.model.game.words.count}`;
     }
 
     animateWordFadeOut(frame = 1) {
@@ -290,11 +326,43 @@ export class View {
         }
     }
 
-    animateScoreIncrease(score, points, frame = 1) {
-        const frames = config.DURATION.ANIMATION.SCORE;
+    resetLetterPathAndCellColors() {
+        this.letterPath.innerHTML = '';
+        for (const letter of utils.iterator.pluck(this.letters, this.model.game.selection.path.indices)) {
+            this.setCellColor(letter, '')
+        }
+    }
+
+
+    /*................RESULTS................*/
+
+    updateGameRecap() {
+        const { score, words } = this.model.game;
+        this.finalScore.textContent = score;
+        this.longestWord.textContent = words.longest;
+    }
+
+    resetChart() {
+        for (const [barFill, barCount] of this.chartBars) {
+            this.updateChartBar(barFill, barCount, '0%', '0');
+        }
+    }
+
+    animateChart(words, frame = 1) {
+        const frames = config.DURATION.ANIMATION.GRAPH;
         if (frame > frames) return
-        const progress = utils.math.smoothStep(frame / frames);
-        this.currentScore.textContent = score + Math.round(points * progress);
-        requestAnimationFrame(() => this.animateScoreIncrease(score, points, frame + 1));
+        const progress = utils.math.easeOutExponential(frame / frames);
+        for (const [barFill, barCount, i] of this.chartBars) {
+            const wordLengthCount = words.length[i + 3];
+            const width = `${100 * progress * wordLengthCount / words.count}%`;
+            const count = Math.round(progress * wordLengthCount);
+            this.updateChartBar(barFill, barCount, width, count);
+        }
+        requestAnimationFrame(() => this.animateChart(words, frame + 1));
+    }
+
+    updateChartBar(barFill, barCount, width, count) {
+        barFill.style.width = width;
+        barCount.textContent = count;
     }
 }
