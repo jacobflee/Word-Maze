@@ -9,8 +9,8 @@ export class View {
         this.setColorConfigs();
         this.setDOMReferences();
         this.setUserName();
-        this.initializeScreens();
         this.injectFriendCards();
+        this.initializeScreens();
     }
 
 
@@ -39,24 +39,17 @@ export class View {
 
     setDOMReferences() {
         // UI
-        this.screens = this.createDataSetObject('.screen', 'screen');
-        this.modeBtns = this.createDataSetObject('.mode-btn', 'mode');
-        this.spooler = this.createSpooler();
+        this.screens = utils.dom.createDataSetObject('.screen', 'screen');
+        this.modeBtns = utils.dom.createDataSetObject('.mode-btn', 'mode');
         this.homeBtns = document.querySelectorAll('.home-btn');
         this.resultsBtn = document.getElementById('results-btn');
-        this.navControls = document.getElementById('nav-controls');
+        this.spooler = this.createSpooler();
 
         // INPUTS
-        this.inputBorders = this.createDataSetObject('.input-border', 'form');
-        this.userNameForm = document.getElementById('user-name-form');
-        this.userNameInput = document.getElementById('user-name');
-        this.searchForm = document.getElementById('search-form');
-        this.inputs = document.querySelectorAll('input');
-        this.forms = document.querySelectorAll('form');
-        this.friendUserName = document.getElementById('friend-user-name');
+        this.forms = utils.dom.createDataSetObject('form', 'form');
         this.inputMessage = this.createInputMessage();
 
-        // FRIEND
+        // FRIENDS
         this.friends = document.getElementById('friends');
 
         // GAME
@@ -64,24 +57,14 @@ export class View {
         this.wordCounter = document.getElementById('word-counter');
         this.currentScore = document.getElementById('current-score');
         this.selectedLetters = document.getElementById('selected-letters');
+        this.letterPath = document.getElementById('letter-path');
         this.cells = document.querySelectorAll('.cell');
         this.letters = document.querySelectorAll('.letter');
-        this.touchTargets = document.querySelectorAll('.touch-target');
-        this.letterPath = document.getElementById('letter-path');
 
         // RESULTS
         this.finalScore = document.getElementById('final-score');
         this.longestWord = document.getElementById('longest-word');
         this.chartBars = this.createChartBars();
-    }
-
-    createDataSetObject(query, attribute) {
-        return Object.fromEntries(
-            Array.from(
-                document.querySelectorAll(query),
-                (element) => [element.dataset[attribute], element]
-            )
-        )
     }
 
     createChartBars() {
@@ -123,14 +106,14 @@ export class View {
     }
 
     selectTimedMode() {
-        this.navControls.style.display = 'none';
+        this.resultsBtn.style.display = 'none';
         this.countdownTimer.style.display = '';
         this.currentScore.textContent = 0;
         this.updateWordCount();
     }
 
     selectFreePlayMode() {
-        this.navControls.style.display = '';
+        this.resultsBtn.style.display = '';
         this.countdownTimer.style.display = 'none';
         this.currentScore.textContent = 0;
         this.updateWordCount();
@@ -176,55 +159,62 @@ export class View {
     }
 
     createFriendCard(friend) {
-        const friendId = friend['userId'];
-        const friendName = friend['userName'];
         const friendCard = document.createElement('button');
         friendCard.className = 'friend';
-        friendCard.textContent = friendName;
-        friendCard.setAttribute('data-user-id', friendId);
-        friendCard.setAttribute('data-user-name', friendName);
+        friendCard.setAttribute('data-id', friend.id);
+        friendCard.setAttribute('data-name', friend.name);
+        const friendCardBorder = document.createElement('div');
+        const friendCardName = document.createElement('span');
+        friendCardName.textContent = friend.name;
+        friendCard.appendChild(friendCardBorder);
+        friendCard.appendChild(friendCardName);
         return friendCard
     }
 
     setUserName() {
-        this.userNameInput.value = this.model.user.name;
+        this.forms.user.name.value = this.model.user.name;
         this.setUserNameWidth();
     }
 
     setUserNameWidth() {
-        this.userNameInput.style.width = `${this.userNameInput.value.length}ch`;
+        const userNameInput = this.forms.user.name;
+        userNameInput.style.width = `${userNameInput.value.length + 2}ch`;
     }
 
     showInputMessage(form) {
         const message = this.model.ui.message;
-        const inputBorder = this.inputBorders[form];
+        const inputBorder = this.forms[form].name.nextElementSibling;
         inputBorder.style.setProperty('--input-border-color', message.borderColor);
         const [icon, text] = this.inputMessage.children;
         icon.className = message.class;
         text.innerHTML = message.text;
-        text.style.color =  message.color;
+        text.style.color = message.color;
         inputBorder.after(this.inputMessage);
     }
 
     hideInputMessage(form) {
-        const inputBorder = this.inputBorders[form];
+        const inputBorder = this.forms[form].name.nextElementSibling;
         inputBorder.style.setProperty('--input-border-color', '');
         this.inputMessage.remove();
     }
 
     resetFriendInput() {
-        this.friendUserName.value = '';
+        this.forms.friend.name.value = '';
     }
 
-    animateMessageFadeOut(frame = 1) {
+    animateMessageFadeOut(inputBorder, frame = 1) {
         const frames = config.DURATION.ANIMATION.MESSAGE;
         if (frame > frames) {
-            this.inputMessage.style.opacity = 1;
             this.inputMessage.remove();
+            this.inputMessage.style.opacity = 1;
+            inputBorder.classList.remove('success-border');
+            inputBorder.style.opacity = '';
         } else {
             const progress = frame / frames;
-            this.inputMessage.style.opacity = 1 - progress;
-            requestAnimationFrame(() => this.animateMessageFadeOut(frame + 1));
+            const opacity = 1 - progress;
+            this.inputMessage.style.opacity = opacity;
+            inputBorder.style.opacity = opacity;
+            requestAnimationFrame(() => this.animateMessageFadeOut(inputBorder, frame + 1));
         }
     }
 

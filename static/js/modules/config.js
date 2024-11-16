@@ -53,7 +53,7 @@ export const config = (() => {
     const DURATION = {
         GAME: 91,
         ANIMATION: {
-            MESSAGE: 12,
+            MESSAGE: 18,
             CELL: 12,
             WORD: 12,
             SCORE: 28,

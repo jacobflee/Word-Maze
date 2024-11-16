@@ -1,23 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
-	<mask id="mask">
-		<rect x="0" y="0" width="256" height="256" fill="#FFF" />
-        <rect x="0" y="0" width="48" height="48" fill="#000" />
-        <circle cx="48" cy="48" r="48" fill="#FFF" />
-        <rect x="208" y="0" width="48" height="48" fill="#000" />
-        <circle cx="208" cy="48" r="48" fill="#FFF" />
-        <rect x="0" y="208" width="48" height="48" fill="#000" />
-        <circle cx="48" cy="208" r="48" fill="#FFF" />
-        <rect x="208" y="208" width="48" height="48" fill="#000" />
-        <circle cx="208" cy="208" r="48" fill="#FFF" />
-        <circle cx="72" cy="72" r="18" fill="#000" />
-        <line x1="72" y1="72" x2="128" y2="72" stroke-width="36" stroke="#000" />
-        <circle cx="128" cy="72" r="18" fill="#000" />
-        <circle cx="72" cy="128" r="18" fill="#000" />
-        <line x1="72" y1="128" x2="184" y2="128" stroke-width="36" stroke="#000" />
-        <circle cx="184" cy="128" r="18" fill="#000" />
-        <circle cx="72" cy="184" r="18" fill="#000" />
-        <line x1="72" y1="184" x2="100" y2="184" stroke-width="36" stroke="#000" />
-        <circle cx="100" cy="184" r="18" fill="#000" />
-	</mask>
-	<rect x="0" y="0" width="256" height="256" fill="#FFF" mask="url(#mask)" />
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 32 448 448" fill="#FFF">
+	<path d="M448 96c0-35.3-28.7-64-64-64L64 32C28.7 32 0 60.7 0 96L0 416c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-320zM256 160c0 17.7-14.3 32-32 32l-96 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l96 0c17.7 0 32 14.3 32 32zm64 64c17.7 0 32 14.3 32 32s-14.3 32-32 32l-192 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l192 0zM192 352c0 17.7-14.3 32-32 32l-32 0c-17.7 0-32-14.3-32-32s14.3-32 32-32l32 0c17.7 0 32 14.3 32 32z" />
 </svg>

@@ -19,6 +19,15 @@ export class Model {
     }
 
 
+    /*................GLOBAL................*/
+
+    setOnlineStatus(event) {
+        if (this.user.id) {
+            this.api.updateOnlineStatus(this.user.id, event.type === 'focus');
+        }
+    }
+
+
     /*................UI................*/
 
     resetLoading() {
@@ -29,6 +38,9 @@ export class Model {
         this.ui.loading = true;
         this.ui.mode = mode;
         this.resetGame();
+        if (mode !== 'free') {
+            this.resetTime();
+        }
     }
 
     setCurrentScreen(screen) {
@@ -116,7 +128,7 @@ export class Model {
     async addFriend(userName) {
         const friends = this.user.friends;
         if (friends.names.has(userName)) {
-            const index = friends.order.findIndex((friend) => friend.userName === userName);
+            const index = friends.order.findIndex((friend) => friend.name === userName);
             const [friend] = friends.order.splice(index, 1);
             friends.order.unshift(friend);
             this.storage.setFriendsOrder(friends.order);
@@ -132,10 +144,10 @@ export class Model {
             this.setErrorMessage(data.error);
         } else {
             const userId = data['user_id'];
-            friends.order.unshift({ userId, userName });
+            friends.order.unshift({ id: userId, name: userName });
             friends.ids.add(userId);
             friends.names.add(userName);
-            this.storage.setFriends(friends);
+            this.storage.setFriendsOrder(friends.order);
             this.setSuccessMessage('friend added successfully');
         }
     }
@@ -153,16 +165,19 @@ export class Model {
                 found: utils.object.createObject(13, (i) => i + 3, () => new Set()),
                 length: utils.object.createObject(13, (i) => i + 3, () => 0),
             },
-            time: {
-                id: null,
-                color: '',
-                content: '',
-                remaining: config.DURATION.GAME,
-            },
             cells: Array.from({ length: 16 }, () => ({})),
             selection: null,
         };
         this.resetSelection();
+    }
+
+    resetTime() {
+        this.game.time = {
+            id: null,
+            color: '',
+            content: '',
+            remaining: config.DURATION.GAME,
+        };
     }
 
     resetSelection() {

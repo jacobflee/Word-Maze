@@ -28,14 +28,35 @@ export const utils = (() => {
 
     /*................DOM................*/
 
-    function addEventListeners(elements, events, handler) {
+    // function addEventListeners(elements, events, handler) {
+    //     elements = elements.forEach ? elements : [elements];
+    //     events = events.forEach ? events : [events];
+    //     elements.forEach((element) => {
+    //         events.forEach((event) => {
+    //             element.addEventListener(event, handler);
+    //         });
+    //     });
+    // }
+
+    function addEventListeners(elements, ...eventsHandlerPairs) {
         elements = elements.forEach ? elements : [elements];
-        events = events.forEach ? events : [events];
         elements.forEach((element) => {
-            events.forEach((event) => {
-                element.addEventListener(event, handler);
+            eventsHandlerPairs.forEach(([events, handler]) => {
+                events = events.forEach ? events : [events];
+                events.forEach((event) => {
+                    element.addEventListener(event, handler);
+                });
             });
         });
+    }
+
+   function createDataSetObject(query, attribute) {
+        return Object.fromEntries(
+            Array.from(
+                document.querySelectorAll(query),
+                (element) => [element.dataset[attribute], element]
+            )
+        )
     }
 
 
@@ -63,7 +84,7 @@ export const utils = (() => {
     return {
         math: { easeOutExponential, smoothStep },
         iterator: { zip, pluck },
-        dom: { addEventListeners },
+        dom: { addEventListeners, createDataSetObject },
         object: { createObject },
         string: { secondsToMSS },
     }

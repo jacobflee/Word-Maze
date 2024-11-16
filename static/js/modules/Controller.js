@@ -8,75 +8,72 @@ export class Controller {
         this.model = new Model();
         this.view = new View(this.model);
         this.initializeEventHandlers();
+        this.initializeFriendEventHandlers();
 
-        // this.view.modeBtns['friend'].click();
+        document.getElementById('stats-btn').click();
     }
 
     initializeEventHandlers() {
         /*................WINDOW................*/
         window.addEventListener(
-            'resize',
-            () => this.view.setAppHeight()
+            'resize', () => this.view.setAppHeight()
+        );
+        utils.dom.addEventListeners(
+            window,
+            [['focus', 'blur'], (event) => this.model.setOnlineStatus(event)]
         );
 
         /*................BUTTONS................*/
         utils.dom.addEventListeners(
             this.view.homeBtns,
-            'click',
-            () => this.switchScreen('home')
+            ['click', () => this.switchScreen('home')]
         );
         utils.dom.addEventListeners(
-            Object.values(this.view.modeBtns),
-            'click',
-            (event) => this.startMode(event)
+            document.querySelectorAll('.mode-btn'),
+            ['click', (event) => this.startMode(event)]
         );
         this.view.resultsBtn.addEventListener(
-            'click',
-            () => this.displayResults()
+            'click', () => this.displayResults()
         );
-        utils.dom.addEventListeners(
-            Array.from(this.view.friends.children),
+        document.getElementById('stats-btn').addEventListener(
             'click',
-            (event) => this.initiateFriendGame(event)
+            (event) => this.openStatsScreen(event)
         );
 
         /*................INPUTS................*/
         utils.dom.addEventListeners(
-            this.view.inputs,
-            'input',
-            (event) => this.handleInput(event)
-        );
-        utils.dom.addEventListeners(
-            this.view.inputs,
-            'invalid',
-            (event) => this.handleInvalidInput(event)
-        );
-        utils.dom.addEventListeners(
-            this.view.inputs,
-            'blur',
-            (event) => this.handleInputBlur(event)
+            document.querySelectorAll('input'),
+            ['input', (event) => this.handleInput(event)],
+            ['invalid', (event) => this.handleInvalidInput(event)],
+            ['blur', (event) => this.handleInputBlur(event)],
         );
 
         /*................FORMS................*/
-        this.view.userNameForm.addEventListener(
-            'submit',
-            (event) => this.submitUserNameForm(event)
+        this.view.forms.user.addEventListener(
+            'submit', (event) => this.submitUserNameForm(event)
         );
-        this.view.searchForm.addEventListener(
-            'submit',
-            (event) => this.submitFriendForm(event)
+        this.view.forms.friend.addEventListener(
+            'submit', (event) => this.submitFriendForm(event)
         );
 
         /*................CELLS................*/
         utils.dom.addEventListeners(
-            this.view.touchTargets,
-            ['mousedown', 'mousemove', 'touchstart', 'touchmove'],
-            (event) => this.handleCellInteraction(event)
+            document.querySelectorAll('.touch-target'),
+            [['mousedown', 'mousemove', 'touchstart', 'touchmove'],
+            (event) => this.handleCellInteraction(event)]
         );
         utils.dom.addEventListeners(
             window,
-            ['touchcancel', 'touchend', 'mouseup'],
-            () => this.endSelection()
+            [['touchcancel', 'touchend', 'mouseup'],
+            () => this.endSelection()]
+        );
+    }
+
+
+    initializeFriendEventHandlers() {
+        utils.dom.addEventListeners(
+            document.querySelectorAll('.friend'),
+            ['click', (event) => this.initiateFriendGame(event)]
         );
     }
 
@@ -111,7 +108,7 @@ export class Controller {
                 break
             case 'friend':
                 if (!this.model.user.name) {
-                    this.view.userNameInput.focus();
+                    this.view.forms.user.name.focus();
                     this.view.resetButton();
                     this.model.resetLoading();
                     return;
@@ -120,7 +117,7 @@ export class Controller {
                 this.view.resetButton();
                 this.model.resetLoading();
                 if (this.model.user.friends.ids.length === 0) {
-                    this.view.searchForm['user-name'].focus();
+                    this.view.forms.friend.name.focus();
                     return
                 }
                 break
@@ -133,10 +130,15 @@ export class Controller {
     }
 
 
+    openStatsScreen() {
+        this.switchScreen('stats');
+    }
+
+
     /*................INPUTS................*/
 
     handleInput(event) {
-        const form = event.currentTarget.dataset['form'];
+        const form = event.currentTarget.form.dataset.form;
         if (this.model.ui.message?.error) {
             this.resetInputMessage(form);
         }
@@ -147,14 +149,14 @@ export class Controller {
 
     handleInvalidInput(event) {
         event.preventDefault();
-        const form = event.currentTarget.dataset['form'];
+        const form = event.currentTarget.form.dataset.form;
         const userName = event.currentTarget.value;
         this.model.setFormError(userName);
         this.view.showInputMessage(form);
     }
 
     handleInputBlur(event) {
-        const form = event.currentTarget.dataset['form'];
+        const form = event.currentTarget.form.dataset.form;
         if (this.model.ui.message?.error) {
             this.resetInputMessage(form);
         }
@@ -172,41 +174,40 @@ export class Controller {
 
     async submitUserNameForm(event) {
         event.preventDefault();
-        const userName = event.currentTarget['user-name'].value;
-        await this.model.setUserName(userName);
+        const userNameInput = event.currentTarget.name;
+        await this.model.setUserName(userNameInput.value);
         if (!this.model.ui.message) {
             document.activeElement.blur();
             return
         }
-        if (this.model.ui.message.error) {
-            this.view.showInputMessage('user');
-        } else {
-            document.activeElement.blur();
-            this.view.showInputMessage('user');
-            this.model.resetMessage();
-            setTimeout(() => this.view.animateMessageFadeOut(), 2000);
-        }
+        this.view.showInputMessage('user');
+        if (this.model.ui.message.error) return
+        document.activeElement.blur();
+        this.model.resetMessage();
+        const inputBorder = userNameInput.nextElementSibling;
+        inputBorder.classList.add('success-border');
+        setTimeout(() => this.view.animateMessageFadeOut(inputBorder), 1200);
     }
-    
+
     async submitFriendForm(event) {
         event.preventDefault();
-        const userName = event.currentTarget['user-name'].value;
-        await this.model.addFriend(userName);
-        if (this.model.ui.message.error) {
-            this.view.showInputMessage('friend');
-        } else {
-            this.view.injectFriendCards();
-            document.activeElement.blur();
-            this.view.showInputMessage('friend');
-            this.model.resetMessage();
-            setTimeout(() => this.view.animateMessageFadeOut(), 2000);
-        }
+        const userNameInput = event.currentTarget.name;
+        await this.model.addFriend(userNameInput.value);
+        this.view.showInputMessage('friend');
+        if (this.model.ui.message.error) return
+        this.view.injectFriendCards();
+        this.initializeFriendEventHandlers();
+        document.activeElement.blur();
+        this.model.resetMessage();
+        const inputBorder = this.view.friends.firstElementChild.firstElementChild;
+        inputBorder.classList.add('success-border');
+        setTimeout(() => this.view.animateMessageFadeOut(inputBorder), 800);
     }
 
     initiateFriendGame(event) {
         const friendCard = event.currentTarget;
-        const friendId = friendCard.dataset['userId'];
-        const friendName = friendCard.dataset['userName'];
+        const friendId = friendCard.dataset.id;
+        const friendName = friendCard.dataset.name;
         alert(`initiate match with:\n      user-id:  ${friendId}\nuser-name:  ${friendName}`);
     }
 

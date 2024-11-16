@@ -5,20 +5,22 @@ import json
 import os
 
 
-#................INIT................#
+# ................INIT................#
 
 app = flask.Flask(__name__)
 db = database.Database()
 
 
-#................RENDER................#
+# ................RENDER................#
+
 
 @app.route("/")
 def index():
     return flask.render_template("index.html")
 
 
-#................CREATE................#
+# ................CREATE................#
+
 
 @app.route("/create_new_user", methods=["POST"])
 def create_new_user():
@@ -27,7 +29,8 @@ def create_new_user():
     return flask.jsonify(data)
 
 
-#................UPDATE................#
+# ................UPDATE................#
+
 
 @app.route("/update_user_name", methods=["POST"])
 def update_user_name():
@@ -42,7 +45,7 @@ def update_online_status():
     user_id = flask.request.json.get("userId")
     online_status = flask.request.json.get("onlineStatus")
     data = db.update_online_status(user_id, online_status)
-    return data
+    return flask.jsonify(data)
 
 
 @app.route("/update_friend_match_query", methods=["POST"])
@@ -50,7 +53,7 @@ def update_friend_match_query():
     user_id = flask.request.json.get("userId")
     friend_match_query = flask.request.json.get("friendMatchQuery")
     data = db.update_friend_match_query(user_id, friend_match_query)
-    return data
+    return flask.jsonify(data)
 
 
 @app.route("/update_random_match_query", methods=["POST"])
@@ -58,14 +61,15 @@ def update_random_match_query():
     user_id = flask.request.json.get("userId")
     random_match_query = flask.request.json.get("randomMatchQuery")
     data = db.update_random_match_query(user_id, random_match_query)
-    return data
+    return flask.jsonify(data)
 
 
-#................READ................#
+# ................READ................#
+
 
 @app.route("/fetch_new_game_data")
 def fetch_new_game_data():
-    directory = 'static/assets/jsons'
+    directory = "static/assets/jsons"
     filenames = os.listdir(directory)
     filename = random.choice(filenames)
     filepath = os.path.join(directory, filename)
@@ -78,10 +82,10 @@ def fetch_new_game_data():
 def fetch_user_id():
     user_name = flask.request.json.get("userName")
     data = db.fetch_user_id(user_name)
-    return data
+    return flask.jsonify(data)
 
 
-#................RUN................#
+# ................RUN................#
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)

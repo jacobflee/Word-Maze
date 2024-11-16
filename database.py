@@ -3,10 +3,9 @@ import sqlite3
 
 
 class Database:
-    def __init__(self, db_path='database.db'):
+    def __init__(self, db_path="database.db"):
         self.db_path = db_path
         self.create_table()
-
 
     @contextmanager
     def get_cur(self):
@@ -18,8 +17,7 @@ class Database:
         finally:
             con.close()
 
-
-    #................CREATE................#
+    # ................CREATE................#
 
     def create_table(self):
         with self.get_cur() as cur:
@@ -34,7 +32,6 @@ class Database:
                 )
                 """
             )
-
 
     def create_new_user(self, user_name):
         with self.get_cur() as cur:
@@ -55,16 +52,15 @@ class Database:
                     },
                 )
                 return {
-                    'user_id': cur.lastrowid,
+                    "user_id": cur.lastrowid,
                 }
             except sqlite3.IntegrityError:
                 return {
-                    'error': 'username is already taken',
+                    "error": "username is already taken",
                 }
-            
 
-    #................UPDATE................#
-    
+    # ................UPDATE................#
+
     def update_user_name(self, user_id, user_name):
         with self.get_cur() as cur:
             try:
@@ -75,16 +71,15 @@ class Database:
                     WHERE user_id = :user_id
                     """,
                     {
-                        'user_id': user_id,
-                        'user_name': user_name,
-                    }
+                        "user_id": user_id,
+                        "user_name": user_name,
+                    },
                 )
             except sqlite3.IntegrityError:
                 return {
-                    'error': 'username is already taken',
+                    "error": "username is already taken",
                 }
-            
-    
+
     def update_online_status(self, user_id, online_status):
         with self.get_cur() as cur:
             cur.execute(
@@ -94,11 +89,10 @@ class Database:
                 WHERE user_id = :user_id
                 """,
                 {
-                    'user_id': user_id,
-                    'online_status': online_status,
-                }
+                    "user_id": user_id,
+                    "online_status": online_status,
+                },
             )
-    
 
     def update_friend_match_query(self, user_id, friend_match_query):
         with self.get_cur() as cur:
@@ -109,11 +103,10 @@ class Database:
                 WHERE user_id = :user_id
                 """,
                 {
-                    'user_id': user_id,
-                    'friend_match_query': friend_match_query,
-                }
+                    "user_id": user_id,
+                    "friend_match_query": friend_match_query,
+                },
             )
-
 
     def update_random_match_query(self, user_id, random_match_query):
         with self.get_cur() as cur:
@@ -124,13 +117,12 @@ class Database:
                 WHERE user_id = :user_id
                 """,
                 {
-                    'user_id': user_id,
-                    'random_match_query': random_match_query,
-                }
+                    "user_id": user_id,
+                    "random_match_query": random_match_query,
+                },
             )
-            
 
-    #................READ................#
+    # ................READ................#
 
     def fetch_user_id(self, user_name):
         with self.get_cur() as cur:
@@ -141,15 +133,15 @@ class Database:
                 WHERE user_name = :user_name
                 """,
                 {
-                    'user_name': user_name,
-                }
+                    "user_name": user_name,
+                },
             )
             user_id = cur.fetchone()
             if user_id:
                 return {
-                    'user_id': user_id[0],
+                    "user_id": user_id[0],
                 }
             else:
                 return {
-                    'error': 'username not found',
+                    "error": "username not found",
                 }

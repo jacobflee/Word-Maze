@@ -102,30 +102,18 @@ header i {
 }
 
 .icon-checkmark {
-    mask: url('../assets/icons/checkmark-background.svg');
+    mask: url('../assets/icons/checkmark.svg');
     background-color: var(--success-color);
 }
 
-.icon-checkmark::after {
-    background: url('../assets/icons/checkmark-foreground.svg');
-}
-
 .icon-warning {
-    mask: url('../assets/icons/warning-background.svg');
+    mask: url('../assets/icons/warning.svg');
     background-color: var(--warning-color);
 }
 
-.icon-warning::after {
-    background: url('../assets/icons/warning-foreground.svg');
-}
-
 .icon-error {
-    mask: url('../assets/icons/error-background.svg');
+    mask: url('../assets/icons/error.svg');
     background-color: var(--error-color);
-}
-
-.icon-error::after {
-    background: url('../assets/icons/error-foreground.svg');
 }
 
 
@@ -141,7 +129,7 @@ summary::marker {
 }
 
 
-/*................INPUT TEXT................*/
+/*................INPUT................*/
 
 .input-wrapper {
     height: calc(8 * var(--base-unit));
@@ -184,6 +172,7 @@ input:focus~.input-border {
 input:focus~.input-border:after,
 input:focus~.input-border:before {
     width: 50%;
+
 }
 
 .input-border:before {
@@ -211,27 +200,29 @@ input:focus~.input-border:before {
 }
 
 .input-message i {
-    position: relative;
     width: calc(2 * var(--base-unit));
     height: calc(2 * var(--base-unit));
-}
-
-.input-message i::after {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 100%;
 }
 
 .input-message span {
     font-size: calc(2 * var(--base-unit));
 }
 
+.success-border {
+    --input-border-color: #0000;
+    opacity: 1;
+    border: 2px solid var(--success-color);
+    border-radius: calc(4 * var(--base-unit));
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
 
 /*................LOADING ANIMATIONS................*/
 
 .icon-spooler {
-    animation: spooling 150ms linear infinite;
+    animation: spooling 1s linear infinite;
 }
 
 @keyframes spooling {
@@ -240,7 +231,7 @@ input:focus~.input-border:before {
     }
 
     100% {
-        transform: rotate(45deg);
+        transform: rotate(360deg);
     }
 }
 
@@ -270,17 +261,17 @@ input:focus~.input-border:before {
 
 /*................HOME................*/
 
-main {
-    gap: calc(8 * var(--base-unit)) !important;
+main.screen {
+    gap: calc(8 * var(--base-unit));
 }
 
-#game-name {
+#game-title {
     font-size: calc(7 * var(--base-unit));
     font-weight: 700;
     margin-right: calc(2 * var(--base-unit));
 }
 
-#user-name {
+#user-name-input {
     text-align: center;
     font-size: calc(4 * var(--base-unit));
     min-width: 17ch;
@@ -288,11 +279,12 @@ main {
     caret-color: var(--primary-text-color);
 }
 
-#user-name::placeholder {
+#user-name-input::placeholder {
     color: var(--secondary-text-color);
 }
 
-.mode-btn {
+.mode-btn,
+#stats-btn {
     height: calc(16 * var(--base-unit));
     border: 0;
     background: linear-gradient(to right, var(--primary-background-color), var(--secondary-background-color));
@@ -301,11 +293,12 @@ main {
     font-size: calc(4.5 * var(--base-unit));
 }
 
-.mode-btn i {
+.mode-btn i,
+#stats-btn i {
     position: absolute;
-    left: 0;
+    left: calc(5 * var(--base-unit));
     top: calc(5 * var(--base-unit));
-    width: calc(15 * var(--base-unit));
+    width: calc(6 * var(--base-unit));
     height: calc(6 * var(--base-unit));
 }
 
@@ -321,11 +314,14 @@ main {
 
 .friend {
     border-radius: calc(4 * var(--base-unit));
-    width: calc(var(--app-width) / 2 - 2 * var(--base-unit));
     height: calc(16 * var(--base-unit));
     padding: 0 calc(4 * var(--base-unit));
-    border: 1px solid white;
     word-wrap: break-word;
+    background: linear-gradient(to bottom, #1267, #1263);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
 }
 
 
@@ -397,14 +393,9 @@ main {
 .touch-target {
     position: absolute;
     z-index: 1;
-    width: 90%;
-    height: 90%;
-    border-radius: 50%;
-}
-
-#nav-controls {
-    display: flex;
-    gap: calc(6 * var(--base-unit));
+    width: 80%;
+    height: 80%;
+    border-radius: 40%;
 }
 
 

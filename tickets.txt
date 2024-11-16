@@ -1,85 +1,43 @@
-if friend game initiated make sure to check if username has changed
+update user stats in local storage (for each end selection)
+create screen to display user stats
 
 
-pattern where parent has listener with mult children and decide which child was hit
+add to local storage handler
+    user stats
+        high_score
+        longest_word
+        game_count
+        wins
+        losses
+        ties
+        word_count
+        word_length_distribution
 
 
-on username change success
-blur
-then show message
-them retract message
-
-
-add extra div to create disappearing border to input username and top friend card
-
-
-all username form and input error conditions matched generically for friend search
-first goal to to change all username set functions to handle input generically
-
-
-game.time not necessary in freeplay
-
-
-you dont need to store friendIds and friendNames in localStorage
-you could just create them on open since
-the majority of the compute is array to set
-
-
-could make it so friend list isnt repopulated fully each time
-would only reduce js compute not reduce repaints
-
-
-grid of friendCards has css that makes each card a specific width?
-that's stupid bro
+css sizing should fit a square screen (edge case)
 
 
 consider in addSelectedCell making it class based (add remove class) instead of dom manipulation
 
 
-navControls being only in the free play header is odd, maybe?
+recoop naming conventions they got way out of alignment
+update vs set naming convention
 
 
-userName input max 25 once you hit N characters the padding disappears and looks bad
+consider cases in API and DB where you can replace ['attr'] with .attr
 
 
-update vs set
-
-
-implement startMode and friendSearch
-
-
-onconnect and ondisconnect update database that user is online
-
-
-create screen to display user stats
-
-
-implement local storage handler
-    user id
-        user name
-        user ids (friends)
-        user stats
-            high_score
-            longest_word
-            game_count
-            wins
-            losses
-            ties
-            word_count
-            word_length_distribution
-
-
-after each game update local storage user stats
-
-
-config make COLORS.CELL.XXX among other more specific sub categories
-
-
-fix naming (selectedLetters is current word text)
-
-
+css is likely a mess needs to be looked at and cleaned
+srange widths, 100% vs inherit, refine current organization
 create css vars for named sizes like font size and width
     then have claude write names for isolating sizes
+
+
+implement friend game
+if friend game initiated make sure to check if username has changed
+
+
+implement random game
 
 
 generate gameboards during downtime to dish out later
@@ -88,7 +46,7 @@ generate gameboards during downtime to dish out later
 gameboards shouldn't contain >2 of the same letter
 
 
-gameboards made with word injection should follow a distribution
+gameboards made with word injection should follow a defined distribution
     to ensure not every board will have a 14/15 letter word
     some boards may just have a 9/10 letter word
     this makes the highest scoring words rare
