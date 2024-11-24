@@ -5,7 +5,7 @@ import { utils } from './utils.js';
 export class View {
     constructor(model) {
         this.model = model;
-        this.setAppHeight();
+        this.setDimensions();
         this.setColorConfigs();
         this.setDOMReferences();
         this.setUserName();
@@ -16,8 +16,20 @@ export class View {
 
     /*................CSS................*/
 
-    setAppHeight() {
-        document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`);
+    setDimensions() {
+        const aspectRatio = utils.math.clamp(
+            config.DIMENSIONS.MIN_ASPECT_RATIO,
+            window.innerWidth / window.innerHeight,
+            config.DIMENSIONS.MAX_ASPECT_RATIO,
+        );
+        const w = utils.math.round(Math.min(
+            aspectRatio * window.innerHeight,
+            config.DIMENSIONS.MAX_WIDTH_RATIO * window.innerWidth
+        ) / 100, 3);
+        const h = utils.math.round(w / aspectRatio, 3);
+        console.log(utils.math.round(aspectRatio, 3), w, h);
+        document.documentElement.style.setProperty('--w', `${w}px`);
+        document.documentElement.style.setProperty('--h', `${h}px`);
     }
 
     setColorConfigs() {
@@ -26,6 +38,7 @@ export class View {
         document.documentElement.style.setProperty('--path-selected-color', config.COLOR.PATH.SELECTED);
         document.documentElement.style.setProperty('--primary-background-color', config.COLOR.BACKGROUND.PRIMARY);
         document.documentElement.style.setProperty('--secondary-background-color', config.COLOR.BACKGROUND.SECONDARY);
+        document.documentElement.style.setProperty('--tertiary-background-color', config.COLOR.BACKGROUND.TERTIARY);
         document.documentElement.style.setProperty('--primary-highlight-color', config.COLOR.HIGHLIGHT.PRIMARY);
         document.documentElement.style.setProperty('--primary-text-color', config.COLOR.TEXT.PRIMARY);
         document.documentElement.style.setProperty('--secondary-text-color', config.COLOR.TEXT.SECONDARY);
@@ -41,7 +54,6 @@ export class View {
         // UI
         this.screens = utils.dom.createDataSetObject('.screen', 'screen');
         this.modeBtns = utils.dom.createDataSetObject('.mode-btn', 'mode');
-        this.homeBtns = document.querySelectorAll('.home-btn');
         this.resultsBtn = document.getElementById('results-btn');
         this.spooler = this.createSpooler();
 
@@ -50,7 +62,7 @@ export class View {
         this.inputMessage = this.createInputMessage();
 
         // FRIENDS
-        this.friends = document.getElementById('friends');
+        this.friends = document.getElementById('friend-list');
 
         // GAME
         this.countdownTimer = document.getElementById('countdown-timer');
@@ -150,7 +162,7 @@ export class View {
 
     injectFriendCards() {
         const documentFragment = document.createDocumentFragment();
-        const friends = this.model.user.friends.order.slice(0, 8);
+        const friends = this.model.user.friends.order.slice(0, 10);
         friends.forEach((friend) => {
             const friendCard = this.createFriendCard(friend);
             documentFragment.append(friendCard);
@@ -240,7 +252,7 @@ export class View {
         cell.style.width = `${93 + 7 * progress}%`;
         cell.style.height = cell.style.width;
         cell.style.borderRadius = `${40 - 15 * progress}%`;
-        cell.style.fontSize = `calc(${11.5 + 2 * progress} * var(--base-unit))`;
+        cell.style.fontSize = `calc(${9 + 3 * progress} * var(--board-unit))`;
         requestAnimationFrame(() => this.animateCellSelection(cell, frame + 1));
     }
 

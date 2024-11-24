@@ -24,6 +24,7 @@ export const config = (() => {
         BACKGROUND: {
             PRIMARY: '#000',
             SECONDARY: '#126',
+            TERTIARY: '#001',
         },
         HIGHLIGHT: {
             PRIMARY: '#0BD',
@@ -61,5 +62,11 @@ export const config = (() => {
         },
     };
 
-    return { COLOR, POINTS, DURATION }
-})()
+    const DIMENSIONS = {
+        MIN_ASPECT_RATIO: 0.5,
+        MAX_ASPECT_RATIO: 0.75,
+        MAX_WIDTH_RATIO: 0.9,
+    }
+
+    return { COLOR, POINTS, DURATION, DIMENSIONS }
+})();

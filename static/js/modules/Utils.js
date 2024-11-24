@@ -9,6 +9,22 @@ export const utils = (() => {
         return 3 * Math.pow(t, 2) - 2 * Math.pow(t, 3)
     }
 
+    function clamp(min, value, max) {
+        return Math.min(Math.max(value, min), max)
+    }
+
+    function round(x, k = 0) {
+        return Math.round(x * 10 ** k) / 10 ** k
+    }
+
+    function randInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1) + min)
+    }
+
+    function randInts(length, min, max) {
+        return Array.from({ length }, () => randInt(min, max))
+    }
+
 
     /*................ITERATOR................*/
 
@@ -28,16 +44,6 @@ export const utils = (() => {
 
     /*................DOM................*/
 
-    // function addEventListeners(elements, events, handler) {
-    //     elements = elements.forEach ? elements : [elements];
-    //     events = events.forEach ? events : [events];
-    //     elements.forEach((element) => {
-    //         events.forEach((event) => {
-    //             element.addEventListener(event, handler);
-    //         });
-    //     });
-    // }
-
     function addEventListeners(elements, ...eventsHandlerPairs) {
         elements = elements.forEach ? elements : [elements];
         elements.forEach((element) => {
@@ -50,7 +56,7 @@ export const utils = (() => {
         });
     }
 
-   function createDataSetObject(query, attribute) {
+    function createDataSetObject(query, attribute) {
         return Object.fromEntries(
             Array.from(
                 document.querySelectorAll(query),
@@ -81,12 +87,22 @@ export const utils = (() => {
     }
 
 
+    /*................STORAGE................*/
+
+    function printSize() {
+        const b = new Blob(Object.entries(localStorage)).size;
+        const kb = `${(b / 1024).toFixed(2)} KB`;
+        console.log(kb);
+    }
+
+
     return {
-        math: { easeOutExponential, smoothStep },
+        math: { easeOutExponential, smoothStep, clamp, round, randInt, randInts },
         iterator: { zip, pluck },
         dom: { addEventListeners, createDataSetObject },
         object: { createObject },
         string: { secondsToMSS },
+        storage: { printSize },
     }
 })();
 

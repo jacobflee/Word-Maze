@@ -16,7 +16,7 @@ export class Controller {
     initializeEventHandlers() {
         /*................WINDOW................*/
         window.addEventListener(
-            'resize', () => this.view.setAppHeight()
+            'resize', () => this.view.setDimensions()
         );
         utils.dom.addEventListeners(
             window,
@@ -25,7 +25,7 @@ export class Controller {
 
         /*................BUTTONS................*/
         utils.dom.addEventListeners(
-            this.view.homeBtns,
+            document.querySelectorAll('.home-btn'),
             ['click', () => this.switchScreen('home')]
         );
         utils.dom.addEventListeners(
@@ -107,12 +107,12 @@ export class Controller {
                 this.model.resetLoading();
                 break
             case 'friend':
-                if (!this.model.user.name) {
-                    this.view.forms.user.name.focus();
-                    this.view.resetButton();
-                    this.model.resetLoading();
-                    return;
-                }
+                // if (!this.model.user.name) {
+                //     this.view.forms.user.name.focus();
+                //     this.view.resetButton();
+                //     this.model.resetLoading();
+                //     return;
+                // }
                 this.switchScreen('friend');
                 this.view.resetButton();
                 this.model.resetLoading();
@@ -138,6 +138,7 @@ export class Controller {
     /*................INPUTS................*/
 
     handleInput(event) {
+        if (!event.currentTarget.form) return;
         const form = event.currentTarget.form.dataset.form;
         if (this.model.ui.message?.error) {
             this.resetInputMessage(form);
@@ -156,6 +157,7 @@ export class Controller {
     }
 
     handleInputBlur(event) {
+        if (!event.currentTarget.form) return;
         const form = event.currentTarget.form.dataset.form;
         if (this.model.ui.message?.error) {
             this.resetInputMessage(form);
@@ -201,7 +203,7 @@ export class Controller {
         this.model.resetMessage();
         const inputBorder = this.view.friends.firstElementChild.firstElementChild;
         inputBorder.classList.add('success-border');
-        setTimeout(() => this.view.animateMessageFadeOut(inputBorder), 800);
+        setTimeout(() => this.view.animateMessageFadeOut(inputBorder), 1200);
     }
 
     initiateFriendGame(event) {

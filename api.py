@@ -89,3 +89,6 @@ def fetch_user_id():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8000, debug=True)
+"""
+NODE_NO_WARNINGS=1 browser-sync start --proxy "0.0.0.0:8000" --files "static/**/*", "templates/**/*" --no-open --no-notify
+"""

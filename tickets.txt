@@ -1,3 +1,24 @@
+get chart to either not render or hide itself on creation
+then show itself again
+trouble with getting it to not render itself in beforeRender
+got it to hide itself in afterRender but had to wait animation times
+so set duration to 0 or set animations to false either set in config.options or modify config.options in beforeRender
+    handleAfterInitialRender is true so afterRender will run
+    afterRender will begin immediately since animation.duration is 0
+    if duration 0
+        call chart hide which will hide immediately
+        set duration to 1000
+    afterRender will begin immediately
+    if duration not 0
+        set handleAfterInitialRender to false
+    handleAfterInitialRender is set to false so afterRender will not run
+downside of hiding itself is duration is hardcoded for all charts
+
+
+
+setAppHeight now sets original aspect ratio and should have its name changed
+
+
 update user stats in local storage (for each end selection)
 create screen to display user stats
 
@@ -12,6 +33,7 @@ add to local storage handler
         ties
         word_count
         word_length_distribution
+        average score
 
 
 css sizing should fit a square screen (edge case)

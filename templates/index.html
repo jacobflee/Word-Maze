@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,49 +17,50 @@
     <link rel="apple-touch-icon" type="image/svg+xml" href="./static/assets/logos/logo.svg" />
     <link rel="apple-touch-icon" type="image/png" href="./static/assets/logos/logo.png" />
 
-    <script type="module" src="./static/js/main.js"></script>
-
     <title>Word Maze</title>
 </head>
 
 <body>
     <!--................HOME................-->
-    
+
     <main class="screen" data-screen="home">
         <header>
             <details>
-                <summary id="game-title">Word Maze</summary>
-                <span>hi grandma!</span>
+                <summary>Word Maze</summary>
+                <div class="glitch-effect" data-text="hi grandma!">hi grandma!</div>
             </details>
             <form data-form="user">
                 <div class="input-wrapper">
-                    <input type="text" id="user-name-input" name="name" required maxlength="23" pattern="^\S.*\S$|^\S$"
-                    placeholder="create username" autocomplete="off" autocapitalize="none" spellcheck="false" />
+                    <input type="text" id="user-name-input" name="name" required maxlength="24" pattern="^\S.*\S$|^\S$"
+                        placeholder="create username" autocomplete="off" autocapitalize="none" spellcheck="false" />
                     <div class="input-border"></div>
                 </div>
             </form>
         </header>
-        <button class="mode-btn" data-mode="timed">
-            <i class="icon-clock"></i>
-            <span>Timed</span>
-        </button>
-        <button class="mode-btn" data-mode="free">
-            <i class="icon-circle"></i>
-            <span>Free Play</span>
-        </button>
-        <button class="mode-btn" data-mode="friend">
-            <i class="icon-friends"></i>
-            <span>VS Friend</span>
-        </button>
-        <button class="mode-btn" data-mode="random">
-            <i class="icon-random"></i>
-            <span>VS Random</span>
-        </button>
-        <button id="stats-btn">
-            <i class="icon-results"></i>
-            <span>Stats</span>
-        </button>
+        <div id="modes">
+            <button class="mode-btn" data-mode="timed">
+                <i class="icon-clock"></i>
+                <span>Timed</span>
+            </button>
+            <button class="mode-btn" data-mode="free">
+                <i class="icon-circle"></i>
+                <span>Free Play</span>
+            </button>
+            <button class="mode-btn" data-mode="friend">
+                <i class="icon-friends"></i>
+                <span>VS Friend</span>
+            </button>
+            <button class="mode-btn" data-mode="random">
+                <i class="icon-random"></i>
+                <span>VS Random</span>
+            </button>
+            <button id="stats-btn">
+                <i class="icon-results"></i>
+                <span>Stats</span>
+            </button>
+        </div>
     </main>
+
 
     <!--................FRIEND................-->
 
@@ -69,14 +70,17 @@
                 <i class="icon-home"></i>
             </button>
         </header>
-        <form data-form="friend">
-            <div class="input-wrapper">
-                <input type="text" name="name" required maxlength="23" pattern="^\S.*\S$|^\S$"
-                    placeholder="search for a friend..." autocomplete="off" autocapitalize="none" spellcheck="false" />
-                <div class="input-border"></div>
-            </div>
-        </form>
         <div id="friends">
+            <form data-form="friend">
+                <div class="input-wrapper">
+                    <input type="text" name="name" required maxlength="24" pattern="^\S.*\S$|^\S$"
+                        placeholder="search for a friend..." autocomplete="off" autocapitalize="none"
+                        spellcheck="false" />
+                    <div class="input-border"></div>
+                </div>
+            </form>
+            <div id="friend-list">
+            </div>
         </div>
     </section>
 
@@ -84,7 +88,6 @@
     <!--................GAME................-->
 
     <section class="screen" data-screen="game">
-        <svg id="letter-path"></svg>
         <header>
             <button id="results-btn">
                 <i class="icon-results"></i>
@@ -92,157 +95,75 @@
             <time id="countdown-timer"></time>
             <span id="word-counter"></span>
         </header>
-        <span id="current-score"></span>
-        <span id="selected-letters">&nbsp;</span>
-        <div id="board">
-            <div class="cell" data-index="0" style="grid-area: 1 / 1;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="1" style="grid-area: 1 / 2;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="2" style="grid-area: 1 / 3;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="3" style="grid-area: 1 / 4;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="4" style="grid-area: 2 / 1;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="5" style="grid-area: 2 / 2;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="6" style="grid-area: 2 / 3;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="7" style="grid-area: 2 / 4;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="8" style="grid-area: 3 / 1;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="9" style="grid-area: 3 / 2;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="10" style="grid-area: 3 / 3;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="11" style="grid-area: 3 / 4;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="12" style="grid-area: 4 / 1;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="13" style="grid-area: 4 / 2;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="14" style="grid-area: 4 / 3;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-            <div class="cell" data-index="15" style="grid-area: 4 / 4;">
-                <span class="letter"></span>
-                <div class="touch-target"></div>
-            </div>
-        </div>
-    </section>
-
-
-    <!--................RESULTS................-->
-
-    <section class="screen" data-screen="results">
-        <header>
-            <button class="home-btn">
-                <i class="icon-home"></i>
-            </button>
-        </header>
-        <div id="game-recap">
-            <span>Score:</span>
-            <span id="final-score"></span>
-            <span>Longest Word:</span>
-            <span id="longest-word"></span>
-        </div>
-        <div id="word-length-chart">
-            <span>Word Length Distribution:</span>
-            <div class="chart-bar">
-                <span>&nbsp;3</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;4</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;5</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;6</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;7</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;8</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;9</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>10</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>11</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>12</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>13</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>14</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>15</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
+        <div id="game">
+            <span id="current-score"></span>
+            <span id="selected-letters">&nbsp;</span>
+            <div id="board">
+                <svg id="letter-path"></svg>
+                <div class="cell" data-index="0" style="grid-area: 1 / 1;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="1" style="grid-area: 1 / 2;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="2" style="grid-area: 1 / 3;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="3" style="grid-area: 1 / 4;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="4" style="grid-area: 2 / 1;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="5" style="grid-area: 2 / 2;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="6" style="grid-area: 2 / 3;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="7" style="grid-area: 2 / 4;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="8" style="grid-area: 3 / 1;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="9" style="grid-area: 3 / 2;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="10" style="grid-area: 3 / 3;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="11" style="grid-area: 3 / 4;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="12" style="grid-area: 4 / 1;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="13" style="grid-area: 4 / 2;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="14" style="grid-area: 4 / 3;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
+                <div class="cell" data-index="15" style="grid-area: 4 / 4;">
+                    <span class="letter"></span>
+                    <div class="touch-target"></div>
+                </div>
             </div>
         </div>
     </section>
@@ -255,93 +176,225 @@
             <button class="home-btn">
                 <i class="icon-home"></i>
             </button>
+            <button id="hide">hide</button>
+            <button id="show">show</button>
+            <div class="radio-selector" id="mode-stats">
+                <input name="mode-stats" type="radio" id="timed-stats">
+                <label for="timed-stats">
+                    <i class="icon-clock"></i>
+                </label>
+                <input name="mode-stats" type="radio" id="free-play-stats">
+                <label for="free-play-stats">
+                    <i class="icon-circle"></i>
+                </label>
+                <input name="mode-stats" type="radio" id="multiplayer-stats" checked>
+                <label for="multiplayer-stats">
+                    <i class="icon-friends"></i>
+                </label>
+            </div>
         </header>
-        <div id="game-recap">
-            
-            <span>High Score:</span>
-            <span id="final-score"></span>
-            <span>Longest Word:</span>
-            <span id="longest-word"></span>
-            <span>Games Played:</span>
-            <span id=""></span>
-            <span>Games Won:</span>
-            <span id=""></span>
-            <span>Games Lost:</span>
-            <span id=""></span>
-            <span>Games Tied:</span>
-            <span id=""></span>
-            <span>Total Word Count:</span>
-            <span id=""></span>
-        </div>
-        <div id="word-length-chart">
-            <span>Word Length Distribution:</span>
-            <div class="chart-bar">
-                <span>&nbsp;3</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
+        <div id="stats">
+            <div id="stats-highlights">
+                <div>
+                    <span>Longest Word</span>
+                    <span id="longest-word">JOURNALIZATIONS</span>
+                </div>
+                <div>
+                    <span>High Score</span>
+                    <span id="final-score">1,234,567</span>
+                </div>
             </div>
-            <div class="chart-bar">
-                <span>&nbsp;4</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
+            <div id="stats-outcomes">
+                <div>
+                    <span>Games</span>
+                    <span id="games-played">25</span>
+                </div>
+                <div>
+                    <span>Wins</span>
+                    <span id="games-won">13</span>
+                </div>
+                <div>
+                    <span>Losses</span>
+                    <span id="games-lost">11</span>
+                </div>
+                <div>
+                    <span>Ties</span>
+                    <span id="games-tied">1</span>
+                </div>
             </div>
-            <div class="chart-bar">
-                <span>&nbsp;5</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
+            <div id="stats-totals">
+                <div>
+                    <span>Word Count</span>
+                    <span id="total-word-count">12500</span>
+                </div>
+                <div>
+                    <span>Total Score</span>
+                    <span id="total-score">987,654,321</span>
+                </div>
             </div>
-            <div class="chart-bar">
-                <span>&nbsp;6</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
+            <div class="radio-selector" id="mode-distributions">
+                <input name="mode-distributions" type="radio" id="word-length-stats">
+                <label for="word-length-stats">Word Lengths</label>
+                <input name="mode-distributions" type="radio" id="score-stats" checked>
+                <label for="score-stats">Scores</label>
             </div>
-            <div class="chart-bar">
-                <span>&nbsp;7</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
+            <div class="chart-container">
+                <canvas id="distribution-chart"></canvas>
             </div>
-            <div class="chart-bar">
-                <span>&nbsp;8</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>&nbsp;9</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>10</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>11</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>12</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>13</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>14</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
-            <div class="chart-bar">
-                <span>15</span>
-                <div class="bar-fill"></div>
-                <span class="bar-count"></span>
-            </div>
+
         </div>
     </section>
+
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.6/dist/chart.umd.min.js"></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+    <script type="module" src="./static/js/main.js"></script>
+
+    <script>
+        function createWordLengthsChart() {
+            const game = {
+                words: {
+                    length: Object.fromEntries(Array.from(
+                        { length: 13 },
+                        (_, i) => [i + 3, Math.floor(Math.random() * (100 + 1))],
+                    )),
+                },
+            };
+            const labels = Object.keys(game.words.length);
+            const data = Object.values(game.words.length);
+            const config = {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{ data }],
+                },
+                plugins: [ChartDataLabels],
+                options: {
+                    indexAxis: 'y',
+                    animation: {
+                        onProgress: (context) => {
+                            context.chart.$progress = context.currentStep / context.numSteps;
+                            context.chart.$complete = false;
+                            chart.update('none');
+                        },
+                        onComplete: (context) => {
+                            if (context.chart.$complete) return
+                            context.chart.$progress = 1;
+                            context.chart.$complete = true;
+                            chart.update('none');
+                        },
+                    },
+                    plugins: {
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'right',
+                            formatter: (value, context) => Math.round(context.chart.$progress * value),
+                        },
+                    },
+                    scales: {
+                        x: {
+                            display: false,
+                        },
+                        y: {
+                            ticks: {
+                                autoSkip: false,
+                            },
+                        },
+                    },
+                    transitions: {
+                        show: {
+                            animations: {
+                                x: {
+                                    from: 0,
+                                },
+                            },
+                        },
+                        hide: {
+                            animations: {
+                                x: {
+                                    to: 0,
+                                },
+                            },
+                        },
+                    },
+                    layout: {
+                        padding: {
+                            right: 0.6 * Chart.defaults.font.size * (1 + Math.max(...data).toString().length),
+                        },
+                    },
+                    datasets: {
+                        bar: {
+                            minBarLength: 1,
+                        },
+                    },
+                },
+            };
+
+            return new Chart('distribution-chart', config);
+        }
+
+        function createScoresChart() {
+            const highScore = 10_000;
+            const scores = JSON.parse(localStorage.getItem('scores'));
+            const binCount = 100;
+
+            const binSize = highScore / binCount;
+            const labels = Array.from({ length: binCount }, (_, i) => 1000 * Math.round(i * binSize / 1000));
+            const data = new Array(binCount).fill(0);
+            scores.forEach((score) => data[Math.floor(score / binSize)]++);
+            const config = {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{ data }],
+                },
+                plugins: [{
+                    id: 'updateTransitionY',
+                    afterRender: (chart) => {
+                        chart.options.transitions.show.animations.y = { from: chart.canvas.clientHeight };
+                        chart.options.transitions.hide.animations.y = { to: chart.canvas.clientHeight };
+                    },
+                }],
+            };
+            return new Chart('distribution-chart', config);
+        }
+
+        const h = 6;
+        const config = {
+            COLOR: {
+                CHART: '#39D',
+                TEXT: {
+                    PRIMARY: '#FFF',
+                },
+            },
+            DURATION: {
+                ANIMATION: {
+                    GRAPH: 1000,
+                },
+            },
+        }
+
+        Chart.defaults.backgroundColor = config.COLOR.CHART;
+        Chart.defaults.color = config.COLOR.TEXT.PRIMARY;
+        Chart.defaults.animation.duration = config.DURATION.ANIMATION.GRAPH;
+        Chart.defaults.animation.easing = 'easeOutCirc';
+        Chart.defaults.font.family = 'Cousine';
+        Chart.defaults.font.size = 2.5 * h;
+        Chart.defaults.maintainAspectRatio = false;
+        Chart.defaults.interaction.mode = false;
+        Chart.defaults.scale.grid.display = false;
+        Chart.defaults.plugins.legend = false;
+
+        const chart = createWordLengthsChart();
+        document.getElementById('hide').addEventListener('click', () => chart.hide(0));
+        document.getElementById('show').addEventListener('click', () => chart.show(0));
+
+        // const chart = createScoresChart();
+        // document.getElementById('hide').addEventListener('click', () => chart.update('hide'));
+        // document.getElementById('show').addEventListener('click', () => chart.show(0));
+    </script>
+
 
 </body>
 
